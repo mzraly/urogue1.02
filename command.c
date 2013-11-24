@@ -894,7 +894,7 @@ shell(void)
 
 	md_shellescape();
 
-	printf(retstr);
+	printf("%s", retstr);
 	noecho();
 	crmode();
 	in_shell = FALSE;
