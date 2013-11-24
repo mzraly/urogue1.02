@@ -30,7 +30,7 @@
 void
 command(void)
 {
-    register int ch = 0;
+    static int ch = 0;
     register int ntimes = 1;			/* Number of player moves */
     static int countch, newcount = FALSE;
     int an_after = FALSE;
