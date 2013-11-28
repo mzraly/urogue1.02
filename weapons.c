@@ -214,7 +214,7 @@ fall(struct linked_list *item, int pr)
 	}
 	if (pr) {
 		if (obj->o_type == WEAPON)
-			addmsg("The %s", weaps[obj->o_which]);
+			addmsg("The %s", weaps[obj->o_which].w_name);
 		else
 			addmsg(inv_name(obj, TRUE));
 		msg(" vanishes as it hits the ground.");
