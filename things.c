@@ -122,12 +122,12 @@ inv_name(struct object *obj, int drop)
 	when ARMOR:
 	    if ((obj->o_flags & ISKNOW) || (obj->o_flags & ISPOST))
 		sprintf(prbuf, "%s%s %s",
-		    obj->o_flags & CANRETURN ? " claimed " : "",
+		    obj->o_flags & CANRETURN ? "claimed " : "",
 			num(armors[obj->o_which].a_class - obj->o_ac, 0),
 		    armors[obj->o_which].a_name);
 	    else
 		sprintf(prbuf, "%s%s", 
-			obj->o_flags & CANRETURN ? " claimed " : "",
+			obj->o_flags & CANRETURN ? "claimed " : "",
 			armors[obj->o_which].a_name);
 	when ARTIFACT:
 	    sprintf(prbuf, "the %s", arts[obj->o_which].ar_name);
