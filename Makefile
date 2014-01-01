@@ -67,8 +67,9 @@ tags: $(HDRS) $(CFILES)
 lint:
 	lint -hxbc $(CFILES) $(CRLIB) > linterrs
 
-clang.analyze:
-	clang --analyze $(CFILES)
+clang.d: $(HDRS) $(CFILES)
+	$(MAKE) $(MAKEFILE) clean
+	scan-build -o clang.d $(MAKE) $(MAKEFILE) CC=/usr/share/clang/scan-build/ccc-analyzer
 
 clean:
 	$(RM) $(OBJS1)

@@ -6,6 +6,7 @@ urogue102.exe
 
 # Other make targets:
 .SAVE
+clang.d
 dist
 linterrs
 tags
