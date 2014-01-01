@@ -47,7 +47,7 @@ DOCS=
 CC    = gcc -Wall -Werror
 CFLAGS= -g
 CRLIB = -lcurses
-RM    = rm -f
+RM    = rm -rf
 TAR   = tar
 MAKEFILE = -f Makefile
 
@@ -75,6 +75,7 @@ clean:
 	$(RM) $(OBJS1)
 	$(RM) $(OBJS2)
 	$(RM) core a.exe a.out a.exe.stackdump $(PROGRAM) $(PROGRAM).exe $(PROGRAM).tar $(PROGRAM).tar.gz $(PROGRAM).zip
+	$(RM) clang.d *.plist
 
 count:
 	wc -l $(HDRS) $(CFILES)
