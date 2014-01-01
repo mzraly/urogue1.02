@@ -68,14 +68,12 @@ lint:
 	lint -hxbc $(CFILES) $(CRLIB) > linterrs
 
 clang.d: $(HDRS) $(CFILES)
-	$(MAKE) $(MAKEFILE) clean
 	scan-build -o clang.d $(MAKE) $(MAKEFILE) CC=/usr/share/clang/scan-build/ccc-analyzer
 
 clean:
 	$(RM) $(OBJS1)
 	$(RM) $(OBJS2)
 	$(RM) core a.exe a.out a.exe.stackdump $(PROGRAM) $(PROGRAM).exe $(PROGRAM).tar $(PROGRAM).tar.gz $(PROGRAM).zip
-	$(RM) clang.d *.plist
 
 count:
 	wc -l $(HDRS) $(CFILES)
