@@ -44,7 +44,7 @@ OTHER=control.c new.things README BUGS.TXT lav.c lex.c namefinder.c
 MISC=	Makefile LICENSE.TXT urogue102.sln urogue102.vcproj
 DOCS=
 
-CC    = gcc -Wall -Werror
+CC    = gcc -Wall -Werror -pedantic
 CFLAGS= -g
 CRLIB = -lcurses
 RM    = rm -rf
