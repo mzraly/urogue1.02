@@ -47,7 +47,8 @@ DOCS=
 CC    = gcc -Wall -Werror -pedantic
 CFLAGS= -g
 CRLIB = -lcurses
-RM    = rm -rf
+RM    = rm -f
+RMDIR = rm -rf
 TAR   = tar
 MAKEFILE = -f Makefile
 
@@ -74,6 +75,12 @@ clean:
 	$(RM) $(OBJS1)
 	$(RM) $(OBJS2)
 	$(RM) core a.exe a.out a.exe.stackdump $(PROGRAM) $(PROGRAM).exe $(PROGRAM).tar $(PROGRAM).tar.gz $(PROGRAM).zip
+
+distclean: clean
+	$(RMDIR) clang.d
+	$(RMDIR) dist
+	$(RM) tags linterrs .SAVE
+	$(RM) $(DISTNAME)-*.tar $(DISTNAME)-*.tar.gz $(DISTNAME)-*.zip
 
 count:
 	wc -l $(HDRS) $(CFILES)
