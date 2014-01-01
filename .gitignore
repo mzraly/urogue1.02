@@ -1,0 +1,25 @@
+# Object files and executables:
+*.o
+*.obj
+urogue102
+urogue102.exe
+
+# Other make targets:
+.SAVE
+dist
+linterrs
+tags
+urogue*.tar
+urogue*.tar.gz
+urogue*.zip
+
+# Score file:
+urogue_roll
+
+# Standard stuff that can be ignored.
+*.plist
+*.swp
+*~
+a.exe
+a.out
+core
