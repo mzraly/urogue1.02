@@ -76,12 +76,10 @@ missile(int ydelta, int xdelta, struct linked_list *item, struct thing *tp)
 	*/
 	if (!hit_monster(unc(obj->o_pos), obj, tp)) {
 		if (obj->o_type == WEAPON && obj->o_which == GRENADE) {
-			register struct room *rp;
             static coord fpos;
 
             msg("BOOOM!");
             aggravate();
-            rp = roomin(&obj->o_pos);
             if (ntraps + 1 < MAXTRAPS + MAXTRAPS &&
 					fallpos(&obj->o_pos, &fpos, TRUE)) {
 				mvaddch(fpos.y, fpos.x, TRAPDOOR);

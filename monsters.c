@@ -316,8 +316,7 @@ wake_monster(int y, int x)
 {
     register struct thing *tp;
     register struct linked_list *it;
-    register struct room *rp, *trp;
-    register int ch;
+    register struct room *trp;
     register char *mname;
 
     if ((it = find_mons(y, x)) == NULL) {
@@ -325,9 +324,7 @@ wake_monster(int y, int x)
 	return(NULL);
     }
     tp = THINGPTR(it);
-    ch = tp->t_type;
 
-    rp = roomin(&hero);	/* Get the current room for hero */
     trp = roomin(&tp->t_pos); /* Current room for monster */
     mname = monsters[tp->t_index].m_name;
 
@@ -463,7 +460,7 @@ wake_monster(int y, int x)
 	off(player, CANSEE)) ||
 	on(*tp, ISINWALL) ||
 	on(*tp, CANSURPRISE))
-	ch = CCHAR( mvwinch(stdscr, y, x) );
+	mvwinch(stdscr, y, x);
 
     /*
      * hero might be able to hear or smell monster if he can't see it

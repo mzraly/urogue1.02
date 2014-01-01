@@ -32,7 +32,7 @@ command(void)
 {
     static int ch = 0;
     register int ntimes = 1;			/* Number of player moves */
-    static int countch, newcount = FALSE;
+    static int countch;
     int an_after = FALSE;
     static coord dta;
 
@@ -119,7 +119,6 @@ command(void)
 	    if (isdigit(ch))
 	    {
 		count = 0;
-		newcount = TRUE;
 		while (isdigit(ch))
 		{
 		    count = count * 10 + (ch - '0');
@@ -170,7 +169,6 @@ command(void)
 		    break;
 	    }
 
-	    newcount = FALSE;
 	    /*
 	     * execute a command
 	     */

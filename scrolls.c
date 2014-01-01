@@ -364,11 +364,7 @@ read_scroll(int which, int blessed)
 		}
 	    }
 	    else {
-		int rm;
-		struct room *cur_room;
-
-		cur_room = roomin(&hero);
-		rm = teleport();
+		teleport();
 	    }
 	    if (is_scroll)
 	        s_know[S_TELEP] = TRUE;
