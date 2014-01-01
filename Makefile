@@ -68,6 +68,14 @@ tags: $(HDRS) $(CFILES)
 lint:
 	lint -hxbc $(CFILES) $(CRLIB) > linterrs
 
+splint:
+	$(RM) splinterrs
+	-splint +posixlib -weak $(CFILES) > splinterrs
+	@echo
+	@echo -- Ignore error message for /usr/include/bits/confname.h.
+	@echo -- See http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=473595
+	@egrep -c -H '^[^ :]+:[0-9]+:[0-9]+: ' splinterrs
+
 clang.d: $(HDRS) $(CFILES)
 	scan-build -o clang.d $(MAKE) $(MAKEFILE) CC=/usr/share/clang/scan-build/ccc-analyzer
 
@@ -79,7 +87,7 @@ clean:
 distclean: clean
 	$(RMDIR) clang.d
 	$(RMDIR) dist
-	$(RM) tags linterrs .SAVE
+	$(RM) tags linterrs splinterrs .SAVE
 	$(RM) $(DISTNAME)-*.tar $(DISTNAME)-*.tar.gz $(DISTNAME)-*.zip
 
 count:
