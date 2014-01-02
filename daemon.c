@@ -22,7 +22,7 @@
 #define EMPTY 0
 #define DAEMON -1
 
-#define _X_ { EMPTY }
+#define _X_ { EMPTY, NULL, NULL, 0 }
 
 struct delayed_action d_list[MAXDAEMONS] = {
 	_X_, _X_, _X_, _X_, _X_, _X_, _X_, _X_, _X_, _X_,
