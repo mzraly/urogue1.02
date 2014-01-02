@@ -113,7 +113,6 @@ void md_raw_standout();
 void md_raw_standend();
 int  md_readchar();
 int  md_setdsuspchar(int c);
-int  md_shellescape();
 void md_sleep(int s);
 int  md_suspchar();
 int  md_hasclreol();
