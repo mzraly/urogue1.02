@@ -26,7 +26,7 @@
 #include "mach_dep.h"
 #include "rogue.h"
 
-static char *rip[15] = {		
+static char *rip[] = {
 "                       __________",
 "                      /          \\",
 "                     /    REST    \\",
