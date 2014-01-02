@@ -77,6 +77,7 @@ splint:
 	@egrep -c -H '^[^ :]+:[0-9]+:[0-9]+: ' splinterrs
 
 clang.d: $(HDRS) $(CFILES)
+	$(MAKE) $(MAKEFILE) clean
 	scan-build -o clang.d $(MAKE) $(MAKEFILE) CC=/usr/share/clang/scan-build/ccc-analyzer
 
 clean:
