@@ -1217,7 +1217,7 @@ void auto_save(int sig);
 int save_file(char *file_name);
 size_t encwrite (void *start, size_t size, FILE *outf);
 size_t encread (void *start, size_t size, FILE *infd);
-int restore(char *file, char **envp);
+int restore(char *file);
 size_t putword (int word, FILE *file);
 int getword (FILE *fd);
 

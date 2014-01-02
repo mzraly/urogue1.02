@@ -121,9 +121,8 @@ save_file(char *file_name)
 
 /*This is only until all have used this rogue version 1.2 */
 int
-restore(char *file, char **envp)
+restore(char *file)
 {
-    extern char **environ;
     struct stat sbuf2;
 
     makesure();
@@ -190,7 +189,6 @@ restore(char *file, char **envp)
     }
 
 	wrefresh(cw);
-    environ = envp;
     strcpy(file_name, file);
     setup();
     clearok(curscr, TRUE);

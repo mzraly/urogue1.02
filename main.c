@@ -34,7 +34,7 @@ static double avec[3];		/* load average vector */
 FILE *fd_score = NULL;		/* file descriptor the score file */
 
 int
-main(int argc, char *argv[], char **envp)
+main(int argc, char *argv[])
 {
     register char *env;
     register struct linked_list *item;
@@ -170,7 +170,7 @@ main(int argc, char *argv[], char **envp)
     }
 
     if (argc == 2 && argv[1][0] != '\0') {
-	if (!restore(argv[1], envp))/* Note: restore returns on error only */
+	if (!restore(argv[1]))/* Note: restore returns on error only */
 	    exit(1);
     }
     lowtime = (int) time(&now);
