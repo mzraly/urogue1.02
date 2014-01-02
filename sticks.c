@@ -224,7 +224,8 @@ do_zap(int gotdir, int which, int blessed)
 	{
 	    static struct object bolt =
 	    {
-		'*' , {0, 0}, "", 0, "", "1d4" , 0, 0, 100, 1
+		'*' , {0, 0}, "", 0, "", "1d4" , 0, 0, 100, 1,
+                0, 0, 0, 0, "", { 0, 0, 0, 0, 0, NULL }
 	    };
 
 	    sprintf(bolt.o_hurldmg, "%dd4", pstats.s_lvl);
