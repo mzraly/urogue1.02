@@ -70,7 +70,7 @@ lint:
 
 splint:
 	$(RM) splinterrs
-	-splint +posixlib -weak $(CFILES) > splinterrs
+	-splint +posixlib -macrovarprefixexclude -weak -type $(CFILES) > splinterrs
 	@echo
 	@echo -- Ignore error message for /usr/include/bits/confname.h.
 	@echo -- See http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=473595
