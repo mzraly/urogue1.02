@@ -135,7 +135,7 @@ new(size_t size)
     static char errbuf[LINELEN];
 
     if (space == NULL) {
-	sprintf(errbuf,"Rogue ran out of memory (used = %ld, wanted = %d).",
+	sprintf(errbuf,"Rogue ran out of memory (used = %lu, wanted = %d).",
 		md_memused(), (int) size);
 	fatal(errbuf);
     }
