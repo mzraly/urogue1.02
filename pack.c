@@ -196,7 +196,7 @@
  	/*
  	 * Didn't find an exact match, just stick it here
  	 */
- 	if (pack == NULL)
+ 	if (pack == NULL || lp == NULL)  /* This condition may be redundant. */
  	    pack = item;
  	else
  	{

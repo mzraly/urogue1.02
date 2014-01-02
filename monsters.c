@@ -634,6 +634,16 @@ sell(struct thing *tp)
 	char *name;
     } selection[10];
 
+    for (i = 0; i < sizeof(selection)/sizeof(selection[0]); ++i) {
+        selection[i].which = 0;
+        selection[i].plus1 = 0;
+        selection[i].plus2 = 0;
+        selection[i].count = 0;
+        selection[i].worth = 0;
+        selection[i].flags = 0;
+        selection[i].name = NULL;
+    }
+
     min_worth = -1; 		/* hope item is never worth less than this */
     item = find_mons(tp->t_pos.y, tp->t_pos.x); /* Get pointer to monster */
 

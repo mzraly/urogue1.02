@@ -98,10 +98,14 @@ new_item(int size)
 {
     register struct linked_list *item;
 
-    if ((item = (struct linked_list *) new(sizeof *item)) == NULL)
+    if ((item = (struct linked_list *) new(sizeof *item)) == NULL) {
 	msg("Ran out of memory for header after %d items", total);
-    if ((item->l_data = new(size)) == NULL)
+        return NULL;
+    }
+    if ((item->l_data = new(size)) == NULL) {
 	msg("Ran out of memory for data after %d items", total);
+        return NULL;
+    }
     item->l_next = item->l_prev = NULL;
     return item;
 }
@@ -116,8 +120,10 @@ creat_item(void)
 {
     register struct linked_list *item;
 
-    if ((item = (struct linked_list *) new(sizeof *item)) == NULL)
+    if ((item = (struct linked_list *) new(sizeof *item)) == NULL) {
         msg("Ran out of memory for header after %d items", total);
+        return NULL;
+    }
     item->l_next = item->l_prev = NULL;
     return item;
 }

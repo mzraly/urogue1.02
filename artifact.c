@@ -716,19 +716,19 @@ do_major(void)
 		    return;
 		}
 		for (item = pack; item != NULL; item = next(item))
-		    if ((obj = OBJPTR(item)) == cur_weapon)
+		    if ((obj = OBJPTR(item)) == cur_weapon) {
+                        if (obj->o_flags & ISMETAL)
+                            msg("Your %s melts and disappears.", inv_name(obj, TRUE));
+                        else
+                            msg("Your %s crumbles in your hands.", inv_name(obj, TRUE));
+                        obj->o_flags &= ~ISCURSED;
+                        dropcheck(obj);
+                        detach(pack, item);
+                        freeletter(item);
+                        inpack--;
+                        discard(item);
 			break;
-		if (obj->o_flags & ISMETAL)
-		    msg("Your %s melts and disappears.", inv_name(obj, TRUE));
-		else
-		    msg("Your %s crumbles in your hands.",
-				inv_name(obj, TRUE));
-		obj->o_flags &= ~ISCURSED;
-		dropcheck(obj);
-		detach(pack, item);
-		freeletter(item);
-		inpack--;
-		discard(item);
+                    }
 	}
 	when 9: {
 		register struct linked_list *item;
@@ -739,16 +739,16 @@ do_major(void)
 		    return;
 		}
 		for (item = pack; item != NULL; item = next(item))
-		    if ((obj = OBJPTR(item)) == cur_armor)
+		    if ((obj = OBJPTR(item)) == cur_armor) {
+                        msg("Your %s crumbles into small black powdery dust.", inv_name(obj, TRUE));
+                        obj->o_flags &= ~ISCURSED;
+                        dropcheck(obj);
+                        detach(pack, item);
+                        freeletter(item);
+                        inpack--;
+                        discard(item);
 			break;
-		msg("Your %s crumbles into small black powdery dust.",
-				inv_name(obj, TRUE));
-		obj->o_flags &= ~ISCURSED;
-		dropcheck(obj);
-		detach(pack, item);
-		freeletter(item);
-		inpack--;
-		discard(item);
+                    }
 	}
 	otherwise:
 		if (cur_weapon == NULL) {

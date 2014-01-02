@@ -1274,8 +1274,10 @@ rs_read_thing(EFILE *efp, struct thing *t)
 {
     int listid = 0, index = -1;
 
-    if (t == NULL)
-		efseterr(efp, EINVAL);
+    if (t == NULL) {
+        efseterr(efp, EINVAL);
+        return;
+    }
 
     rs_read_marker(efp, RSID_THING);
     rs_read_int(efp, &index);

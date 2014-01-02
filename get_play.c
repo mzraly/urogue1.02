@@ -185,12 +185,11 @@ puta_player(int arm, int wpt, int hpadd, int dmadd)
 	char	pbuf[LINELEN];
 	char	*class;
 	int    i;
-	int	no_write;
+	static int no_write = FALSE;    /* Cannot save character. */
 
 	strcpy(char_file,home);
 	strcat(char_file,ROGDEFS);
 
-	no_write = FALSE;
 	wclear(hw);
 	touchwin(hw);
 

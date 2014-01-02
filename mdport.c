@@ -566,7 +566,7 @@ int
 md_shellescape()
 {
 #if defined(HAVE_WORKING_FORK)
-    int ret_status;
+    int ret_status = -1;
     int pid;
     void (*myquit)(int sig);
     void (*myend)(int sig);
@@ -1174,7 +1174,6 @@ md_readchar(WINDOW *win)
 
 	if (ch == ERR)	    /* timed out waiting for valid sequence */
 	{		    /* flush input so far and start over    */
-	    mode = M_NORMAL;
     	    nocbreak();
 	    raw();
 	    ch = 27;

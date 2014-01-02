@@ -479,8 +479,6 @@ chase(struct thing *tp, coord *ee, int flee, int *mdead)
 		if (deadflg && mdead != NULL)
 			*mdead = 1;
 
-		ch_ret = *er;
-		dist = DISTANCE(ch_ret.y, ch_ret.x, ee->y, ee->x);
 		if (deadflg) return(TRUE);
 	}
 
@@ -495,8 +493,6 @@ chase(struct thing *tp, coord *ee, int flee, int *mdead)
 	    (shoot_dir) &&
 	    (weapon)) {
 		missile(shoot_dir->y, shoot_dir->x, weapon, tp);
-		ch_ret = *er;
-		dist = DISTANCE(ch_ret.y, ch_ret.x, ee->y, ee->x);
 	}
 
     /*

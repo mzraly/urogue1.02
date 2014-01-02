@@ -709,10 +709,16 @@ shoot_bolt(struct thing *shooter, coord start, coord dir, int get_points, int re
     coord spotpos[BOLT_LENGTH];
     int ret_val = FALSE;	/* True if monster gets killed */
 
-    switch (dir.y + dir.x) {
-	when 0: dirch = '/';
-	when 1: case -1: dirch = (dir.y == 0 ? '-' : '|');
-	when 2: case -2: dirch = '\\';
+    switch (abs(dir.y + dir.x)) {
+        case 0:
+            dirch = '/';
+            break;
+        case 1:
+            dirch = (dir.y == 0) ? '-' : '|';
+            break;
+        default:
+            dirch = '\\';
+            break;
     }
     pos.y = start.y + dir.y;
     pos.x = start.x + dir.x;

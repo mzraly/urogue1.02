@@ -150,7 +150,6 @@ create_obj(int which_item, int which_type, int cursed)
 	newitem = which_item;
 
     pt = "those";
-    msz = 0;
     if(newitem == 'm') {
 	makemon();		/* make monster and be done with it */
 	return;
@@ -174,7 +173,6 @@ create_obj(int which_item, int which_type, int cursed)
 	    return;
     }
     if(msz == 1) {		/* if only one type of item */
-	ch = 1;
 	if (thiswin == hw)
 	    restscr(cw);
     }
