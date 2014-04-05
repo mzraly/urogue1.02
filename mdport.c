@@ -32,6 +32,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#ifdef __APPLE__
+#include <mach/mach.h>
+#endif
 #if defined(_WIN32)
 #include <Windows.h>
 #include <Lmcons.h>
@@ -733,6 +736,18 @@ md_srand(int seed)
 unsigned long
 md_memused()
 {
+#ifdef __APPLE__
+    /* Taken from http://blog.kuriositaet.de/?p=257 */
+    struct task_basic_info t_info;
+    mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
+
+    if (KERN_SUCCESS != task_info(mach_task_self(), TASK_BASIC_INFO, (task_info_t)&t_info, &t_info_count)) {
+        /* We can't return -1 since our return type is unsigned. */
+        return 0;
+    }
+
+    return t_info.virtual_size;
+#else
 #ifdef _WIN32
     MEMORYSTATUS stat;
 
@@ -741,6 +756,7 @@ md_memused()
     return((unsigned long)stat.dwTotalPageFile);
 #else
     return( (unsigned long) sbrk(0) );
+#endif
 #endif
 }
 

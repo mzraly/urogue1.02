@@ -578,7 +578,7 @@ loadav(double *avg)
  * ucount:
  *	Count the number of people on the system
  */
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
 int
 ucount(void)
 {
