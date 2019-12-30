@@ -182,7 +182,7 @@ puta_player(int arm, int wpt, int hpadd, int dmadd)
 
 	char char_file[LINELEN];	/* Where the file should be! */
 	register FILE	*fp;
-	char	pbuf[LINELEN];
+	char	pbuf[2*LINELEN];
 	char	*class;
 	int    i;
 	static int no_write = FALSE;    /* Cannot save character. */
