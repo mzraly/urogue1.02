@@ -4,8 +4,8 @@
 
 main()
 {
-	puts(SCOREDIR);
-	puts(PASSCTL);
-	puts(PERMOK);
-	exit(0);
+        puts(SCOREDIR);
+        puts(PASSCTL);
+        puts(PERMOK);
+        exit(0);
 }

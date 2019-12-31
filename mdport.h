@@ -152,11 +152,11 @@ extern int md_exec(const char *path, const char *arg0, const char *arg1);
 
 typedef struct EFILE
 {
-	FILE *fp;
-	unsigned int efp_cksum;
-	unsigned int efp_seed;
-	int efp_iomode;
-	int efp_error;
+        FILE *fp;
+        unsigned int efp_cksum;
+        unsigned int efp_seed;
+        int efp_iomode;
+        int efp_error;
 } EFILE;
 
 void efclearerr(EFILE *efp);

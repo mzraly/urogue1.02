@@ -1,11 +1,11 @@
 /*
     things.c  -  Contains functions for dealing with things like
-	             potions and scrolls
-   
+                     potions and scrolls
+
     UltraRogue
     Copyright (C) 1985 Herb Chong
     All rights reserved.
-    
+
     Based on "Advanced Rogue"
     Copyright (C) 1982, 1984, 1985 Michael Morgan, Ken Dalka and AT&T
     All rights reserved.
@@ -13,7 +13,7 @@
     Based on "Rogue: Exploring the Dungeons of Doom"
     Copyright (C) 1980, 1981 Michael Toy, Ken Arnold and Glenn Wichman
     All rights reserved.
-    
+
     See the file LICENSE.TXT for full copyright and licensing information.
 */
 
@@ -25,159 +25,159 @@
 
 /*
  * inv_name:
- *	return the name of something as it would appear in an
- *	inventory.
+ *      return the name of something as it would appear in an
+ *      inventory.
  */
 char *
 inv_name(struct object *obj, int drop)
 {
-    register char *pb;
+    char *pb;
 
-	if (obj == NULL)
-		return("[NULL Object]");
+        if (obj == NULL)
+                return("[NULL Object]");
 
     switch(obj->o_type)
     {
-	when SCROLL:
-	    if (obj->o_count == 1)
-		 sprintf(prbuf, "A %s%sscroll ", 
-			obj->o_flags & CANRETURN ? "claimed " : "",
-			blesscurse(obj->o_flags));
-	    else
-		 sprintf(prbuf, "%d %s%sscrolls ", 
-			obj->o_count, 
-			obj->o_flags & CANRETURN ? "claimed " : "",
-			blesscurse(obj->o_flags));
-	    pb = &prbuf[strlen(prbuf)];
-	    if (s_know[obj->o_which] || (obj->o_flags & ISPOST))
-		sprintf(pb, "of %s", s_magic[obj->o_which].mi_name);
-	    else if (s_guess[obj->o_which])
-		sprintf(pb, "called %s", s_guess[obj->o_which]);
-	    else
-		sprintf(pb, "titled '%s'", s_names[obj->o_which]);
-    when POTION:
-	    if (obj->o_count == 1)
-		 sprintf(prbuf, "A %s%spotion ", 
-			obj->o_flags & CANRETURN ? "claimed " : "",
-			blesscurse(obj->o_flags));
-	    else
-		 sprintf(prbuf, "%d %s%spotions ", 
-			obj->o_count, 
-			obj->o_flags & CANRETURN ? "claimed " : "",
-			blesscurse(obj->o_flags));
-	    pb = &prbuf[strlen(prbuf)];
-	    if (p_know[obj->o_which] || (obj->o_flags & ISPOST))
-		sprintf(pb, "of %s(%s)", p_magic[obj->o_which].mi_name,
-		    p_colors[obj->o_which]);
-	    else if (p_guess[obj->o_which])
-		sprintf(pb, "called %s(%s)", p_guess[obj->o_which],
-		    p_colors[obj->o_which]);
-	    else {
-		if (obj->o_count == 1)
-		    sprintf(prbuf, "A%s %s potion",
-				obj->o_flags & CANRETURN ? " claimed" :
-			    vowelstr(p_colors[obj->o_which]),
-			    p_colors[obj->o_which]);
-		else
-		    sprintf(prbuf, "%d %s%s potions",
-			    obj->o_count, 
-				obj->o_flags & CANRETURN ? " claimed " : "",
-				p_colors[obj->o_which]);
-	    }
-	when FOOD:
-	    if (obj->o_count == 1)
-		sprintf(prbuf, "A%s %s",
-			obj->o_flags & CANRETURN ? " claimed" :
-			vowelstr(fd_data[obj->o_which].mi_name), 
-			fd_data[obj->o_which].mi_name);
-	    else
-		sprintf(prbuf, "%d %s%ss", obj->o_count,
-			obj->o_flags & CANRETURN ? " claimed " : "",
-			fd_data[obj->o_which].mi_name);
-	when WEAPON:
-	    if (obj->o_count > 1)
-		sprintf(prbuf, "%d ", obj->o_count);
-	    else
-		strcpy(prbuf, "A ");
-	    pb = &prbuf[strlen(prbuf)];
-	    if ((obj->o_flags & ISKNOW) && (obj->o_flags & ISZAPPED))
-		sprintf(pb, "charged%s ", charge_str(obj));
-	    pb = &prbuf[strlen(prbuf)];
-	    if (obj->o_flags & CANRETURN)
-		sprintf(pb, "claimed ");
-	    pb = &prbuf[strlen(prbuf)];
-	    if (obj->o_flags & ISPOISON)
-		sprintf(pb, "poisoned ");
-	    pb = &prbuf[strlen(prbuf)];
-	    if (obj->o_flags & ISSILVER)
-		sprintf(pb, "silver ");
-	    pb = &prbuf[strlen(prbuf)];
-	    if ((obj->o_flags & ISKNOW) || (obj->o_flags & ISPOST))
-		sprintf(pb, "%s %s", num(obj->o_hplus, obj->o_dplus),
-		    weaps[obj->o_which].w_name);
-	    else
-		sprintf(pb, "%s", weaps[obj->o_which].w_name);
-	    if (obj->o_count > 1)
-		strcat(prbuf, "s");
-	when ARMOR:
-	    if ((obj->o_flags & ISKNOW) || (obj->o_flags & ISPOST))
-		sprintf(prbuf, "%s%s %s",
-		    obj->o_flags & CANRETURN ? "claimed " : "",
-			num(armors[obj->o_which].a_class - obj->o_ac, 0),
-		    armors[obj->o_which].a_name);
-	    else
-		sprintf(prbuf, "%s%s", 
-			obj->o_flags & CANRETURN ? "claimed " : "",
-			armors[obj->o_which].a_name);
-	when ARTIFACT:
-	    sprintf(prbuf, "the %s", arts[obj->o_which].ar_name);
-		if (obj->o_flags & CANRETURN)
-			strcat(prbuf, " (claimed)");
-	when STICK:
-	    sprintf(prbuf, "A %s%s%s ", 
-			obj->o_flags & CANRETURN ? "claimed " : "",
-			blesscurse(obj->o_flags), ws_type[obj->o_which]);
-	    pb = &prbuf[strlen(prbuf)];
-	    if (ws_know[obj->o_which] || (obj->o_flags & ISPOST))
-		sprintf(pb, "of %s%s(%s)", ws_magic[obj->o_which].mi_name,
-		    charge_str(obj), ws_made[obj->o_which]);
-	    else if (ws_guess[obj->o_which])
-		sprintf(pb, "called %s(%s)", ws_guess[obj->o_which],
-		    ws_made[obj->o_which]);
-	    else
-		sprintf(&prbuf[2], "%s%s %s",
-			obj->o_flags & CANRETURN ? "claimed " : "",
-			ws_made[obj->o_which],
-		    ws_type[obj->o_which]);
-    when RING:
-	    if (r_know[obj->o_which] || (obj->o_flags & ISPOST))
-		sprintf(prbuf, "A%s%s ring of %s(%s)", 
-			obj->o_flags & CANRETURN ? " claimed" : "", ring_num(obj),
-		    r_magic[obj->o_which].mi_name, r_stones[obj->o_which]);
-	    else if (r_guess[obj->o_which])
-		sprintf(prbuf, "A %sring called %s(%s)",
-			obj->o_flags & CANRETURN ? "claimed " : "",
-		    r_guess[obj->o_which], r_stones[obj->o_which]);
-	    else
-		sprintf(prbuf, "A%s %s ring", 
-			obj->o_flags & CANRETURN ? "claimed " :
-			vowelstr(r_stones[obj->o_which]),
-		    r_stones[obj->o_which]);
-	otherwise:
-	    debug("Picked up something funny");
-	    sprintf(prbuf, "Something bizarre %s", unctrl(obj->o_type));
+        case SCROLL:
+            if (obj->o_count == 1)
+                 sprintf(prbuf, "A %s%sscroll ",
+                        obj->o_flags & CANRETURN ? "claimed " : "",
+                        blesscurse(obj->o_flags));
+            else
+                 sprintf(prbuf, "%d %s%sscrolls ",
+                        obj->o_count,
+                        obj->o_flags & CANRETURN ? "claimed " : "",
+                        blesscurse(obj->o_flags));
+            pb = &prbuf[strlen(prbuf)];
+            if (s_know[obj->o_which] || (obj->o_flags & ISPOST))
+                sprintf(pb, "of %s", s_magic[obj->o_which].mi_name);
+            else if (s_guess[obj->o_which])
+                sprintf(pb, "called %s", s_guess[obj->o_which]);
+            else
+                sprintf(pb, "titled '%s'", s_names[obj->o_which]);
+    break; case POTION:
+            if (obj->o_count == 1)
+                 sprintf(prbuf, "A %s%spotion ",
+                        obj->o_flags & CANRETURN ? "claimed " : "",
+                        blesscurse(obj->o_flags));
+            else
+                 sprintf(prbuf, "%d %s%spotions ",
+                        obj->o_count,
+                        obj->o_flags & CANRETURN ? "claimed " : "",
+                        blesscurse(obj->o_flags));
+            pb = &prbuf[strlen(prbuf)];
+            if (p_know[obj->o_which] || (obj->o_flags & ISPOST))
+                sprintf(pb, "of %s(%s)", p_magic[obj->o_which].mi_name,
+                    p_colors[obj->o_which]);
+            else if (p_guess[obj->o_which])
+                sprintf(pb, "called %s(%s)", p_guess[obj->o_which],
+                    p_colors[obj->o_which]);
+            else {
+                if (obj->o_count == 1)
+                    sprintf(prbuf, "A%s %s potion",
+                                obj->o_flags & CANRETURN ? " claimed" :
+                            vowelstr(p_colors[obj->o_which]),
+                            p_colors[obj->o_which]);
+                else
+                    sprintf(prbuf, "%d %s%s potions",
+                            obj->o_count,
+                                obj->o_flags & CANRETURN ? " claimed " : "",
+                                p_colors[obj->o_which]);
+            }
+        break; case FOOD:
+            if (obj->o_count == 1)
+                sprintf(prbuf, "A%s %s",
+                        obj->o_flags & CANRETURN ? " claimed" :
+                        vowelstr(fd_data[obj->o_which].mi_name),
+                        fd_data[obj->o_which].mi_name);
+            else
+                sprintf(prbuf, "%d %s%ss", obj->o_count,
+                        obj->o_flags & CANRETURN ? " claimed " : "",
+                        fd_data[obj->o_which].mi_name);
+        break; case WEAPON:
+            if (obj->o_count > 1)
+                sprintf(prbuf, "%d ", obj->o_count);
+            else
+                strcpy(prbuf, "A ");
+            pb = &prbuf[strlen(prbuf)];
+            if ((obj->o_flags & ISKNOW) && (obj->o_flags & ISZAPPED))
+                sprintf(pb, "charged%s ", charge_str(obj));
+            pb = &prbuf[strlen(prbuf)];
+            if (obj->o_flags & CANRETURN)
+                sprintf(pb, "claimed ");
+            pb = &prbuf[strlen(prbuf)];
+            if (obj->o_flags & ISPOISON)
+                sprintf(pb, "poisoned ");
+            pb = &prbuf[strlen(prbuf)];
+            if (obj->o_flags & ISSILVER)
+                sprintf(pb, "silver ");
+            pb = &prbuf[strlen(prbuf)];
+            if ((obj->o_flags & ISKNOW) || (obj->o_flags & ISPOST))
+                sprintf(pb, "%s %s", num(obj->o_hplus, obj->o_dplus),
+                    weaps[obj->o_which].w_name);
+            else
+                sprintf(pb, "%s", weaps[obj->o_which].w_name);
+            if (obj->o_count > 1)
+                strcat(prbuf, "s");
+        break; case ARMOR:
+            if ((obj->o_flags & ISKNOW) || (obj->o_flags & ISPOST))
+                sprintf(prbuf, "%s%s %s",
+                    obj->o_flags & CANRETURN ? "claimed " : "",
+                        num(armors[obj->o_which].a_class - obj->o_ac, 0),
+                    armors[obj->o_which].a_name);
+            else
+                sprintf(prbuf, "%s%s",
+                        obj->o_flags & CANRETURN ? "claimed " : "",
+                        armors[obj->o_which].a_name);
+        break; case ARTIFACT:
+            sprintf(prbuf, "the %s", arts[obj->o_which].ar_name);
+                if (obj->o_flags & CANRETURN)
+                        strcat(prbuf, " (claimed)");
+        break; case STICK:
+            sprintf(prbuf, "A %s%s%s ",
+                        obj->o_flags & CANRETURN ? "claimed " : "",
+                        blesscurse(obj->o_flags), ws_type[obj->o_which]);
+            pb = &prbuf[strlen(prbuf)];
+            if (ws_know[obj->o_which] || (obj->o_flags & ISPOST))
+                sprintf(pb, "of %s%s(%s)", ws_magic[obj->o_which].mi_name,
+                    charge_str(obj), ws_made[obj->o_which]);
+            else if (ws_guess[obj->o_which])
+                sprintf(pb, "called %s(%s)", ws_guess[obj->o_which],
+                    ws_made[obj->o_which]);
+            else
+                sprintf(&prbuf[2], "%s%s %s",
+                        obj->o_flags & CANRETURN ? "claimed " : "",
+                        ws_made[obj->o_which],
+                    ws_type[obj->o_which]);
+    break; case RING:
+            if (r_know[obj->o_which] || (obj->o_flags & ISPOST))
+                sprintf(prbuf, "A%s%s ring of %s(%s)",
+                        obj->o_flags & CANRETURN ? " claimed" : "", ring_num(obj),
+                    r_magic[obj->o_which].mi_name, r_stones[obj->o_which]);
+            else if (r_guess[obj->o_which])
+                sprintf(prbuf, "A %sring called %s(%s)",
+                        obj->o_flags & CANRETURN ? "claimed " : "",
+                    r_guess[obj->o_which], r_stones[obj->o_which]);
+            else
+                sprintf(prbuf, "A%s %s ring",
+                        obj->o_flags & CANRETURN ? "claimed " :
+                        vowelstr(r_stones[obj->o_which]),
+                    r_stones[obj->o_which]);
+        break; default:
+            debug("Picked up something funny");
+            sprintf(prbuf, "Something bizarre %s", unctrl(obj->o_type));
     }
 
     /* Is it marked? */
     if (obj->o_mark[0]) {
-	pb = &prbuf[strlen(prbuf)];
-	sprintf(pb, " <%s>", obj->o_mark);
+        pb = &prbuf[strlen(prbuf)];
+        sprintf(pb, " <%s>", obj->o_mark);
     }
 
     if (obj == cur_armor)
-	strcat(prbuf, " (being worn)");
+        strcat(prbuf, " (being worn)");
     if (obj == cur_weapon)
-	strcat(prbuf, " (weapon in hand)");
+        strcat(prbuf, " (weapon in hand)");
     if      (obj == cur_ring[LEFT_1])  strcat(prbuf, " (on left hand)");
     else if (obj == cur_ring[LEFT_2])  strcat(prbuf, " (on left hand)");
     else if (obj == cur_ring[LEFT_3])  strcat(prbuf, " (on left hand)");
@@ -187,50 +187,50 @@ inv_name(struct object *obj, int drop)
     else if (obj == cur_ring[RIGHT_3]) strcat(prbuf, " (on right hand)");
     else if (obj == cur_ring[RIGHT_4]) strcat(prbuf, " (on right hand)");
     if (obj->o_flags & ISPROT)
-	strcat(prbuf, " [protected]");
+        strcat(prbuf, " [protected]");
     if (drop && isupper(prbuf[0]))
-	prbuf[0] = (char) tolower(prbuf[0]);
+        prbuf[0] = (char) tolower(prbuf[0]);
     else if (!drop && islower(*prbuf))
-	*prbuf = (char) toupper(*prbuf);
+        *prbuf = (char) toupper(*prbuf);
     if (!drop)
-	strcat(prbuf, ".");
+        strcat(prbuf, ".");
     return prbuf;
 }
 
 /*
  * drop:
- *	put something down
+ *      put something down
  */
 int
 drop(struct linked_list *item)
 {
-    register int ch = 0;
-    register struct linked_list *obj, *nobj;
-    register struct object *op;
+    int ch = 0;
+    struct linked_list *obj, *nobj;
+    struct object *op;
 
     if (item == NULL) {
-	ch = CCHAR( mvwinch(stdscr, hero.y, hero.x) );
-	if (ch != FLOOR && ch != PASSAGE && ch != POOL) {
-	    msg("There is something there already.");
-	    return(FALSE);
-	}
-	if ((obj = get_item("drop", 0)) == NULL)
-	    return(FALSE);
+        ch = CCHAR( mvwinch(stdscr, hero.y, hero.x) );
+        if (ch != FLOOR && ch != PASSAGE && ch != POOL) {
+            msg("There is something there already.");
+            return(FALSE);
+        }
+        if ((obj = get_item("drop", 0)) == NULL)
+            return(FALSE);
     }
     else {
-	obj = item;
+        obj = item;
     }
     op = (struct object *) ldata(obj);
     if (!dropcheck(op))
-	return(FALSE);
+        return(FALSE);
 
     /*
      * If it is a scare monster scroll, curse it
      */
     if (op->o_type == SCROLL && op->o_which == S_SCARE) {
-	if (op->o_flags & ISBLESSED)
-	    op->o_flags &= ~ISBLESSED;
-	else op->o_flags |= ISCURSED;
+        if (op->o_flags & ISBLESSED)
+            op->o_flags &= ~ISBLESSED;
+        else op->o_flags |= ISCURSED;
     }
 
     /*
@@ -238,47 +238,47 @@ drop(struct linked_list *item)
      */
     if (op->o_count >= 2 && op->o_group == 0)
     {
-	nobj = new_item(sizeof *op);
-	op->o_count--;
-	op = (struct object *) ldata(nobj);
-	*op = *((struct object *) ldata(obj));
-	op->o_count = 1;
-	obj = nobj;
+        nobj = new_item(sizeof *op);
+        op->o_count--;
+        op = (struct object *) ldata(nobj);
+        *op = *((struct object *) ldata(obj));
+        op->o_count = 1;
+        obj = nobj;
     }
     else {
-	detach(pack, obj);
+        detach(pack, obj);
         inpack--;
-	freeletter(obj);
+        freeletter(obj);
     }
     if(ch == POOL) {
-	msg("Your %s sinks out of sight.",inv_name(op,TRUE));
-	discard(obj);
-	obj = NULL;
+        msg("Your %s sinks out of sight.",inv_name(op,TRUE));
+        discard(obj);
+        obj = NULL;
     }
     else if (levtype == POSTLEV) {
-	op->o_pos = hero;	/* same place as hero */
-	if (item == NULL)	/* if item wasn't sold */
-	    msg("Thanks for your donation to the fiend's flea market.");
+        op->o_pos = hero;       /* same place as hero */
+        if (item == NULL)       /* if item wasn't sold */
+            msg("Thanks for your donation to the fiend's flea market.");
         if (op->o_type != ARTIFACT)
-	    fall(obj,FALSE);
-	else {
-	    msg("You'll be sorry you ever got rid of that!");
-	    has_artifact &= ~(1 << op->o_which);
-	    discard(obj);
-	    obj = NULL;
-	}
+            fall(obj,FALSE);
+        else {
+            msg("You'll be sorry you ever got rid of that!");
+            has_artifact &= ~(1 << op->o_which);
+            discard(obj);
+            obj = NULL;
+        }
     }
     else {
-	/*
-	 * Link it into the level object list
-	 */
-	attach(lvl_obj, obj);
-	mvaddch(hero.y, hero.x, op->o_type);
-	op->o_pos = hero;
-	msg("Dropped %s.", inv_name(op, TRUE));
+        /*
+         * Link it into the level object list
+         */
+        attach(lvl_obj, obj);
+        mvaddch(hero.y, hero.x, op->o_type);
+        op->o_pos = hero;
+        msg("Dropped %s.", inv_name(op, TRUE));
     }
     if (op->o_type == ARTIFACT && levtype != POSTLEV)
-	has_artifact &= ~(1 << op->o_which);
+        has_artifact &= ~(1 << op->o_which);
     updpack(FALSE);
     return (TRUE);
 }
@@ -290,67 +290,67 @@ int
 dropcheck(struct object *op)
 {
     if (op == NULL)
-	return TRUE;
+        return TRUE;
     if (levtype == POSTLEV) {
-	if ((op->o_flags & ISCURSED) && (op->o_flags & ISKNOW)) {
-	    msg("The trader does not accept your shoddy merchandise.");
-	    return(FALSE);
-	}
+        if ((op->o_flags & ISCURSED) && (op->o_flags & ISKNOW)) {
+            msg("The trader does not accept your shoddy merchandise.");
+            return(FALSE);
+        }
     }
     if (op != cur_armor && op != cur_weapon &&
-	op != cur_ring[LEFT_1] && op != cur_ring[LEFT_2] &&
-	op != cur_ring[LEFT_3] && op != cur_ring[LEFT_4] &&
-	op != cur_ring[RIGHT_1] && op != cur_ring[RIGHT_2] &&
-	op != cur_ring[RIGHT_3] && op != cur_ring[RIGHT_4]) 
-	    return TRUE;
+        op != cur_ring[LEFT_1] && op != cur_ring[LEFT_2] &&
+        op != cur_ring[LEFT_3] && op != cur_ring[LEFT_4] &&
+        op != cur_ring[RIGHT_1] && op != cur_ring[RIGHT_2] &&
+        op != cur_ring[RIGHT_3] && op != cur_ring[RIGHT_4])
+            return TRUE;
     if (op->o_flags & ISCURSED)
     {
-	msg("You can't.  It appears to be cursed.");
-	return FALSE;
+        msg("You can't.  It appears to be cursed.");
+        return FALSE;
     }
     if (op == cur_weapon)
-	cur_weapon = NULL;
+        cur_weapon = NULL;
     else if (op == cur_armor)
     {
-	cur_armor = NULL;
-	waste_time();
+        cur_armor = NULL;
+        waste_time();
     }
     else if (op == cur_ring[LEFT_1] || op == cur_ring[LEFT_2] ||
-	op == cur_ring[LEFT_3] || op == cur_ring[LEFT_4] ||
-	op == cur_ring[RIGHT_1] || op == cur_ring[RIGHT_2] ||
-	op == cur_ring[RIGHT_3] || op == cur_ring[RIGHT_4])
+        op == cur_ring[LEFT_3] || op == cur_ring[LEFT_4] ||
+        op == cur_ring[RIGHT_1] || op == cur_ring[RIGHT_2] ||
+        op == cur_ring[RIGHT_3] || op == cur_ring[RIGHT_4])
     {
-	if      (op == cur_ring[LEFT_1])  cur_ring[LEFT_1]  = NULL;
-	else if (op == cur_ring[LEFT_2])  cur_ring[LEFT_2]  = NULL;
-	else if (op == cur_ring[LEFT_3])  cur_ring[LEFT_3]  = NULL;
-	else if (op == cur_ring[LEFT_4])  cur_ring[LEFT_4]  = NULL;
-	else if (op == cur_ring[RIGHT_1]) cur_ring[RIGHT_1] = NULL;
-	else if (op == cur_ring[RIGHT_2]) cur_ring[RIGHT_2] = NULL;
-	else if (op == cur_ring[RIGHT_3]) cur_ring[RIGHT_3] = NULL;
-	else if (op == cur_ring[RIGHT_4]) cur_ring[RIGHT_4] = NULL;
-	switch (op->o_which) {
-	    when R_ADDSTR:
-		chg_str(-op->o_ac, FALSE, FALSE);
-	    when R_ADDHIT:
-		chg_dext(-op->o_ac, FALSE, FALSE);
-	    when R_ADDINTEL:
-		pstats.s_intel -= op->o_ac;
-	    when R_ADDWISDOM:
-		pstats.s_wisdom -= op->o_ac;
-	    when R_SEEINVIS:
-		if (find_slot(unsee) == NULL) {
-		    turn_off(player, CANSEE);
-		    msg("The tingling feeling leaves your eyes.");
-		}
-		light(&hero);
-		mvwaddch(cw, hero.y, hero.x, PLAYER);
-	    when R_LIGHT: {
-		    if(roomin(&hero) != NULL) {
-			    light(&hero);
-			    mvwaddch(cw, hero.y, hero.x, PLAYER);
-		    }
-	        }
-	}
+        if      (op == cur_ring[LEFT_1])  cur_ring[LEFT_1]  = NULL;
+        else if (op == cur_ring[LEFT_2])  cur_ring[LEFT_2]  = NULL;
+        else if (op == cur_ring[LEFT_3])  cur_ring[LEFT_3]  = NULL;
+        else if (op == cur_ring[LEFT_4])  cur_ring[LEFT_4]  = NULL;
+        else if (op == cur_ring[RIGHT_1]) cur_ring[RIGHT_1] = NULL;
+        else if (op == cur_ring[RIGHT_2]) cur_ring[RIGHT_2] = NULL;
+        else if (op == cur_ring[RIGHT_3]) cur_ring[RIGHT_3] = NULL;
+        else if (op == cur_ring[RIGHT_4]) cur_ring[RIGHT_4] = NULL;
+        switch (op->o_which) {
+            case R_ADDSTR:
+                chg_str(-op->o_ac, FALSE, FALSE);
+            break; case R_ADDHIT:
+                chg_dext(-op->o_ac, FALSE, FALSE);
+            break; case R_ADDINTEL:
+                pstats.s_intel -= op->o_ac;
+            break; case R_ADDWISDOM:
+                pstats.s_wisdom -= op->o_ac;
+            break; case R_SEEINVIS:
+                if (find_slot(unsee) == NULL) {
+                    turn_off(player, CANSEE);
+                    msg("The tingling feeling leaves your eyes.");
+                }
+                light(&hero);
+                mvwaddch(cw, hero.y, hero.x, PLAYER);
+            break; case R_LIGHT: {
+                    if(roomin(&hero) != NULL) {
+                            light(&hero);
+                            mvwaddch(cw, hero.y, hero.x, PLAYER);
+                    }
+                }
+        }
     }
     return TRUE;
 }
@@ -361,9 +361,9 @@ dropcheck(struct object *op)
 struct linked_list *
 new_thing(void)
 {
-    register struct linked_list *item;
-    register struct object *cur;
-    register int j, k;
+    struct linked_list *item;
+    struct object *cur;
+    int j, k;
     int blesschance, cursechance;
 
     item = new_item(sizeof *cur);
@@ -385,113 +385,113 @@ new_thing(void)
     cursechance = rnd(100);
     switch (no_food > 3 ? 2 : pick_one(things, NUMTHINGS))
     {
-	when 0:
-	    cur->o_type = POTION;
-	    cur->o_which = pick_one(p_magic, MAXPOTIONS);
-	    cur->o_weight = things[TYP_POTION].mi_wght;
-	    if (cursechance < p_magic[cur->o_which].mi_curse)
-		cur->o_flags |= ISCURSED;
-	    else if (blesschance < p_magic[cur->o_which].mi_bless)
-		cur->o_flags |= ISBLESSED;
-	when 1:
-	    cur->o_type = SCROLL;
-	    cur->o_which = pick_one(s_magic, MAXSCROLLS);
-	    cur->o_weight = things[TYP_SCROLL].mi_wght;
-	    if (cursechance < s_magic[cur->o_which].mi_curse)
-		cur->o_flags |= ISCURSED;
-	    else if (blesschance < s_magic[cur->o_which].mi_bless)
-		cur->o_flags |= ISBLESSED;
-	when 2:
-	    no_food = 0;
-	    cur->o_type = FOOD;
-	    cur->o_which = pick_one(fd_data, MAXFOODS);
-	    cur->o_weight = 2;
-	    cur->o_count += extras();
-	when 3:
-	    cur->o_type = WEAPON;
-	    cur->o_which = rnd(MAXWEAPONS);
-	    init_weapon(cur, cur->o_which);
-	    if (cursechance < 10)
-	    {
-		int bad=(rnd(10) < 1) ? 2 : 1;
+        case 0:
+            cur->o_type = POTION;
+            cur->o_which = pick_one(p_magic, MAXPOTIONS);
+            cur->o_weight = things[TYP_POTION].mi_wght;
+            if (cursechance < p_magic[cur->o_which].mi_curse)
+                cur->o_flags |= ISCURSED;
+            else if (blesschance < p_magic[cur->o_which].mi_bless)
+                cur->o_flags |= ISBLESSED;
+        break; case 1:
+            cur->o_type = SCROLL;
+            cur->o_which = pick_one(s_magic, MAXSCROLLS);
+            cur->o_weight = things[TYP_SCROLL].mi_wght;
+            if (cursechance < s_magic[cur->o_which].mi_curse)
+                cur->o_flags |= ISCURSED;
+            else if (blesschance < s_magic[cur->o_which].mi_bless)
+                cur->o_flags |= ISBLESSED;
+        break; case 2:
+            no_food = 0;
+            cur->o_type = FOOD;
+            cur->o_which = pick_one(fd_data, MAXFOODS);
+            cur->o_weight = 2;
+            cur->o_count += extras();
+        break; case 3:
+            cur->o_type = WEAPON;
+            cur->o_which = rnd(MAXWEAPONS);
+            init_weapon(cur, cur->o_which);
+            if (cursechance < 10)
+            {
+                int bad=(rnd(10) < 1) ? 2 : 1;
 
-		cur->o_flags |= ISCURSED;
-		cur->o_hplus -= bad;
-		cur->o_dplus -= bad;
-	    }
-	    else if (blesschance < 15) {
-		int good=(rnd(10) < 1) ? 2 : 1;
+                cur->o_flags |= ISCURSED;
+                cur->o_hplus -= bad;
+                cur->o_dplus -= bad;
+            }
+            else if (blesschance < 15) {
+                int good=(rnd(10) < 1) ? 2 : 1;
 
-		cur->o_hplus += good;
-		cur->o_dplus += good;
-	    }
-	when 4:
-	    cur->o_type = ARMOR;
-	    for (j = 0; j < MAXARMORS; j++)
-		if (blesschance < armors[j].a_prob)
-		    break;
-	    if (j == MAXARMORS)
-	    {
-		debug("Picked a bad armor %d", blesschance);
-		j = 0;
-	    }
-	    cur->o_which = j;
-	    cur->o_ac = armors[j].a_class;
-	    if (((k = rnd(100)) < 20) && j != MITHRIL)
-	    {
-		cur->o_flags |= ISCURSED;
-		cur->o_ac += rnd(3)+1;
-	    }
-	    else if (k < 28 || j == MITHRIL) 
-		cur->o_ac -= rnd(3)+1;
-	    if (j == MITHRIL)
-		cur->o_flags |= ISPROT;
-	    cur->o_weight = armors[j].a_wght;
-	when 5:
-	    cur->o_type = RING;
-	    cur->o_which = pick_one(r_magic, MAXRINGS);
-	    cur->o_weight = things[TYP_RING].mi_wght;
-	    if (cursechance < r_magic[cur->o_which].mi_curse)
-		cur->o_flags |= ISCURSED;
-	    else if (blesschance < r_magic[cur->o_which].mi_bless)
-		cur->o_flags |= ISBLESSED;
-	    switch (cur->o_which)
-	    {
-		when R_ADDSTR:
-		case R_ADDWISDOM:
-		case R_ADDINTEL:
-		case R_PROTECT:
-		case R_ADDHIT:
-		case R_ADDDAM:
-		case R_CARRYING:
-		    cur->o_ac = rnd(2) + 1;	/* From 1 to 3 */
-		    if (cur->o_flags & ISCURSED)
-			cur->o_ac = -cur->o_ac;
-		    if (cur->o_flags & ISBLESSED) cur->o_ac++;
-		when R_RESURRECT:
-		case R_TELCONTROL:
-		case R_VREGEN:
-		    cur->o_ac = 0;
-		    if (cur->o_flags & ISCURSED)
-			cur->o_ac = -1;
-		    if (cur->o_flags & ISBLESSED) 
-			cur->o_ac = 1;
-		when R_DIGEST:
-		    if (cur->o_flags & ISCURSED) cur->o_ac = -1;
-		    else if (cur->o_flags & ISBLESSED) cur->o_ac = 2;
-		    else cur->o_ac = 1;
-	    }
-	when 6:
-	    cur->o_type = STICK;
-	    cur->o_which = pick_one(ws_magic, MAXSTICKS);
-	    fix_stick(cur);
-	    if (cursechance < ws_magic[cur->o_which].mi_curse)
-		cur->o_flags |= ISCURSED;
-	    else if (blesschance < ws_magic[cur->o_which].mi_bless)
-		cur->o_flags |= ISBLESSED;
-	otherwise:
-	    debug("Picked a bad kind of object");
-	    wait_for(cw, ' ');
+                cur->o_hplus += good;
+                cur->o_dplus += good;
+            }
+        break; case 4:
+            cur->o_type = ARMOR;
+            for (j = 0; j < MAXARMORS; j++)
+                if (blesschance < armors[j].a_prob)
+                    break;
+            if (j == MAXARMORS)
+            {
+                debug("Picked a bad armor %d", blesschance);
+                j = 0;
+            }
+            cur->o_which = j;
+            cur->o_ac = armors[j].a_class;
+            if (((k = rnd(100)) < 20) && j != MITHRIL)
+            {
+                cur->o_flags |= ISCURSED;
+                cur->o_ac += rnd(3)+1;
+            }
+            else if (k < 28 || j == MITHRIL)
+                cur->o_ac -= rnd(3)+1;
+            if (j == MITHRIL)
+                cur->o_flags |= ISPROT;
+            cur->o_weight = armors[j].a_wght;
+        break; case 5:
+            cur->o_type = RING;
+            cur->o_which = pick_one(r_magic, MAXRINGS);
+            cur->o_weight = things[TYP_RING].mi_wght;
+            if (cursechance < r_magic[cur->o_which].mi_curse)
+                cur->o_flags |= ISCURSED;
+            else if (blesschance < r_magic[cur->o_which].mi_bless)
+                cur->o_flags |= ISBLESSED;
+            switch (cur->o_which)
+            {
+                case R_ADDSTR:
+                case R_ADDWISDOM:
+                case R_ADDINTEL:
+                case R_PROTECT:
+                case R_ADDHIT:
+                case R_ADDDAM:
+                case R_CARRYING:
+                    cur->o_ac = rnd(2) + 1;     /* From 1 to 3 */
+                    if (cur->o_flags & ISCURSED)
+                        cur->o_ac = -cur->o_ac;
+                    if (cur->o_flags & ISBLESSED) cur->o_ac++;
+                break; case R_RESURRECT:
+                case R_TELCONTROL:
+                case R_VREGEN:
+                    cur->o_ac = 0;
+                    if (cur->o_flags & ISCURSED)
+                        cur->o_ac = -1;
+                    if (cur->o_flags & ISBLESSED)
+                        cur->o_ac = 1;
+                break; case R_DIGEST:
+                    if (cur->o_flags & ISCURSED) cur->o_ac = -1;
+                    else if (cur->o_flags & ISBLESSED) cur->o_ac = 2;
+                    else cur->o_ac = 1;
+            }
+        break; case 6:
+            cur->o_type = STICK;
+            cur->o_which = pick_one(ws_magic, MAXSTICKS);
+            fix_stick(cur);
+            if (cursechance < ws_magic[cur->o_which].mi_curse)
+                cur->o_flags |= ISCURSED;
+            else if (blesschance < ws_magic[cur->o_which].mi_bless)
+                cur->o_flags |= ISBLESSED;
+        break; default:
+            debug("Picked a bad kind of object");
+            wait_for(cw, ' ');
     }
     return item;
 }
@@ -502,8 +502,8 @@ new_thing(void)
 struct linked_list *
 spec_item(int type, int which, int hit, int damage)
 {
-    register struct linked_list *item;
-    register struct object *obj;
+    struct linked_list *item;
+    struct object *obj;
 
     item = new_item(sizeof *obj);
     obj = OBJPTR(item);
@@ -512,7 +512,7 @@ spec_item(int type, int which, int hit, int damage)
     obj->o_type = type;
     obj->o_which = which;
     strcpy(obj->o_damage,"0d0");
-	strcpy(obj->o_hurldmg,"0d0");
+        strcpy(obj->o_hurldmg,"0d0");
     obj->o_hplus = 0;
     obj->o_dplus = 0;
     obj->o_flags = 0;
@@ -523,46 +523,46 @@ spec_item(int type, int which, int hit, int damage)
 
     /* Handle special characteristics */
     switch (type) {
-	when WEAPON:
-	    init_weapon(obj, which);
-	    obj->o_hplus = hit;
-	    obj->o_dplus = damage;
-	    obj->o_ac = 10;
+        case WEAPON:
+            init_weapon(obj, which);
+            obj->o_hplus = hit;
+            obj->o_dplus = damage;
+            obj->o_ac = 10;
 
-	    if (hit > 0 || damage > 0) obj->o_flags |= ISBLESSED;
-	    else if (hit < 0 || damage < 0) obj->o_flags |= ISCURSED;
+            if (hit > 0 || damage > 0) obj->o_flags |= ISBLESSED;
+            else if (hit < 0 || damage < 0) obj->o_flags |= ISCURSED;
 
-	when ARMOR:
-	    obj->o_ac = armors[which].a_class - hit;
-	    if (hit > 0) obj->o_flags |= ISBLESSED;
-	    else if (hit < 0) obj->o_flags |= ISCURSED;
+        break; case ARMOR:
+            obj->o_ac = armors[which].a_class - hit;
+            if (hit > 0) obj->o_flags |= ISBLESSED;
+            else if (hit < 0) obj->o_flags |= ISCURSED;
 
-	when RING:
-	    obj->o_ac = hit;
-	    switch (obj->o_which) {
-		when R_ADDSTR:
-		case R_ADDWISDOM:
-		case R_ADDINTEL:
-		case R_PROTECT:
-		case R_ADDHIT:
-		case R_ADDDAM:
-		case R_DIGEST:
-		case R_RESURRECT:
-		case R_TELCONTROL:
-		    if (hit > 1) 
-			obj->o_flags |= ISBLESSED;
-		    else if (hit < 0) 
-			obj->o_flags |= ISCURSED;
-	    }
+        break; case RING:
+            obj->o_ac = hit;
+            switch (obj->o_which) {
+                case R_ADDSTR:
+                case R_ADDWISDOM:
+                case R_ADDINTEL:
+                case R_PROTECT:
+                case R_ADDHIT:
+                case R_ADDDAM:
+                case R_DIGEST:
+                case R_RESURRECT:
+                case R_TELCONTROL:
+                    if (hit > 1)
+                        obj->o_flags |= ISBLESSED;
+                    else if (hit < 0)
+                        obj->o_flags |= ISCURSED;
+            }
 
-	when STICK:
-	    fix_stick(obj);
-	    obj->o_charges = hit;
+        break; case STICK:
+            fix_stick(obj);
+            obj->o_charges = hit;
 
-	when GOLD:
-	    obj->o_type = GOLD;
-	    obj->o_count = GOLDCALC;
-	    obj->o_ac = 11;
+        break; case GOLD:
+            obj->o_type = GOLD;
+            obj->o_count = GOLDCALC;
+            obj->o_ac = 11;
     }
     return(item);
 }
@@ -573,24 +573,24 @@ spec_item(int type, int which, int hit, int damage)
 int
 pick_one(struct magic_item *magic, int nitems)
 {
-    register struct magic_item *end;
-    register int i;
-    register struct magic_item *start;
+    struct magic_item *end;
+    int i;
+    struct magic_item *start;
 
     start = magic;
     for (end = &magic[nitems], i = rnd(1000); magic < end; magic++) {
-	if (i <= magic->mi_prob)
-	    break;
+        if (i <= magic->mi_prob)
+            break;
     }
     if (magic == end)
     {
-	if (wizard)
-	{
-	    msg("bad pick_one: %d from %d items", i, nitems);
-	    for (magic = start; magic < end; magic++)
-		msg("%s: %d%%", magic->mi_name, magic->mi_prob);
-	}
-	magic = start;
+        if (wizard)
+        {
+            msg("bad pick_one: %d from %d items", i, nitems);
+            for (magic = start; magic < end; magic++)
+                msg("%s: %d%%", magic->mi_name, magic->mi_prob);
+        }
+        magic = start;
     }
     return (int) (magic - start);
 }
@@ -604,27 +604,27 @@ char *
 blesscurse(int flags)
 {
     if (flags & ISKNOW)  {
-	if (flags & ISCURSED) return("cursed ");
-	if (flags & ISBLESSED) return("blessed ");
-	return("normal ");
+        if (flags & ISCURSED) return("cursed ");
+        if (flags & ISBLESSED) return("blessed ");
+        return("normal ");
     }
     return("");
 }
 
 /*
  * extras:
- *	Return the number of extra items to be created
+ *      Return the number of extra items to be created
  */
 int
 extras(void)
 {
-	reg int i;
+        int i;
 
-	i = rnd(100);
-	if (i < 4)		/* 4% for 2 more */
-	    return (2);
-	else if (i < 11)	/* 7% for 1 more */
-	    return (1);
-	else			/* otherwise no more */
-	    return (0);
+        i = rnd(100);
+        if (i < 4)              /* 4% for 2 more */
+            return (2);
+        else if (i < 11)        /* 7% for 1 more */
+            return (1);
+        else                    /* otherwise no more */
+            return (0);
 }
