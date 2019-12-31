@@ -32,8 +32,7 @@
 
 int sigdie = -1;
 
-int
-save_game(void)
+int save_game(void)
 {
     int c;
     char buf[LINELEN];
@@ -42,39 +41,35 @@ save_game(void)
      * get file name
      */
     mpos = 0;
-    if (file_name[0] != '\0')
-    {
-        msg("Save file (%s)? ", file_name);
-        do
-        {
-            c = readchar(msgw) & 0177;
-            if (c == ESCAPE) return(0);
-        } while (c != 'n' && c != 'N' && c != 'y' && c != 'Y');
-        mpos = 0;
-        if (c == 'y' || c == 'Y')
-        {
-            msg("File name: %s", file_name);
-            goto gotfile;
-        }
+    if (file_name[0] != '\0') {
+	msg("Save file (%s)? ", file_name);
+	do {
+	    c = readchar(msgw) & 0177;
+	    if (c == ESCAPE)
+		return (0);
+	} while (c != 'n' && c != 'N' && c != 'y' && c != 'Y');
+	mpos = 0;
+	if (c == 'y' || c == 'Y') {
+	    msg("File name: %s", file_name);
+	    goto gotfile;
+	}
     }
 
-    for(;;)
-    {
-        msg("File name: ");
-        mpos = 0;
-        buf[0] = '\0';
-        if (get_str(buf, msgw) == QUIT)
-        {
-            msg("");
-            return FALSE;
-        }
-        strcpy(file_name, buf);
-gotfile:
-    if (save_file(file_name) != 0)
-                msg(strerror(errno));
-        else
-                break;
-        }
+    for (;;) {
+	msg("File name: ");
+	mpos = 0;
+	buf[0] = '\0';
+	if (get_str(buf, msgw) == QUIT) {
+	    msg("");
+	    return FALSE;
+	}
+	strcpy(file_name, buf);
+      gotfile:
+	if (save_file(file_name) != 0)
+	    msg(strerror(errno));
+	else
+	    break;
+    }
 
     return TRUE;
 }
@@ -83,8 +78,7 @@ gotfile:
  * automatically save a file.  This is used if a HUP signal is
  * recieved
  */
-void
-auto_save(int sig)
+void auto_save(int sig)
 {
     /*
      * Code added by Bruce Dautrich on 4/11/84 to
@@ -94,34 +88,32 @@ auto_save(int sig)
      */
 
     if (sigdie == -1) {
-        /*This is first signal*/
-        sigdie=sig;
-        signal(sig,SIG_IGN);
-        goto got1sig;
+	/*This is first signal */
+	sigdie = sig;
+	signal(sig, SIG_IGN);
+	goto got1sig;
     } else {
-        /*This is second signal*/
-        signal(sig,SIG_IGN);
+	/*This is second signal */
+	signal(sig, SIG_IGN);
     }
 
-got1sig:
-        save_file(file_name);
+  got1sig:
+    save_file(file_name);
     exit(1);
 }
 
 /*
  * write the saved game on the file
  */
-int
-save_file(char *file_name)
+int save_file(char *file_name)
 {
-    wmove(cw, LINES-1, 0);
+    wmove(cw, LINES - 1, 0);
     draw(cw);
     return (rs_save_file(file_name));
 }
 
 /*This is only until all have used this rogue version 1.2 */
-int
-restore(char *file)
+int restore(char *file)
 {
     struct stat sbuf2;
 
@@ -130,10 +122,10 @@ restore(char *file)
     /*
      * Reset the effective uid & gid to the real ones.
      */
-        md_normaluser();
+    md_normaluser();
 
     if (strcmp(file, "-r") == 0)
-        file = file_name;
+	file = file_name;
 
     /*
      * Set the new terminal and make sure we aren't going to a smaller screen.
@@ -145,58 +137,57 @@ restore(char *file)
     mw = newwin(LINES, COLS, 0, 0);
     hw = newwin(LINES, COLS, 0, 0);
     msgw = newwin(4, COLS, 0, 0);
-    keypad(cw,1);
-    keypad(msgw,1);
+    keypad(cw, 1);
+    keypad(msgw, 1);
 
-        mpos = 0;
+    mpos = 0;
     mvwprintw(cw, 0, 0, "%s: %s", file, ctime(&sbuf2.st_mtime));
 
     /*
      * defeat multiple restarting from the same place
      */
     if (!wizard) {
-        stat(file, &sbuf2);
-        if (sbuf2.st_nlink != 1) {
-            printf("Cannot restore from a linked file\n");
-            return FALSE;
-        }
+	stat(file, &sbuf2);
+	if (sbuf2.st_nlink != 1) {
+	    printf("Cannot restore from a linked file\n");
+	    return FALSE;
+	}
     }
 
-        endwin();
+    endwin();
 
-    if (rs_restore_file(file) != 0)
-    {
-                if (strcmp(oversion, version) != 0)
-                {
-                        fprintf(stderr, "Save Game Version: %s\nReal Game Version: %s\n", oversion, version);
-                        fprintf(stderr, "Sorry, saved game is out of date.\n");
-                }
+    if (rs_restore_file(file) != 0) {
+	if (strcmp(oversion, version) != 0) {
+	    fprintf(stderr,
+		    "Save Game Version: %s\nReal Game Version: %s\n",
+		    oversion, version);
+	    fprintf(stderr, "Sorry, saved game is out of date.\n");
+	}
 
-                printf("\nCannot restore file\n");
-        return(FALSE);
+	printf("\nCannot restore file\n");
+	return (FALSE);
     }
 
     if (COLS < oldcol || LINES < oldline) {
-        fprintf(stderr, "Cannot restart the game on a smaller screen.\n");
-        return FALSE;
+	fprintf(stderr, "Cannot restart the game on a smaller screen.\n");
+	return FALSE;
     }
 
-        if (strcmp(oversion, version) != 0)
-    {
-                fprintf(stderr, "Save Game Version: %s\nReal Game Version: %s\n", oversion, version);
-                fprintf(stderr, "Sorry, saved game is out of date.\n");
-                return FALSE;
+    if (strcmp(oversion, version) != 0) {
+	fprintf(stderr, "Save Game Version: %s\nReal Game Version: %s\n",
+		oversion, version);
+	fprintf(stderr, "Sorry, saved game is out of date.\n");
+	return FALSE;
     }
 
-        wrefresh(cw);
+    wrefresh(cw);
     strcpy(file_name, file);
     setup();
     clearok(curscr, TRUE);
     touchwin(cw);
     md_srand(md_getpid());
     playit();
-    /*NOTREACHED*/
-        return(0);
+     /*NOTREACHED*/ return (0);
 }
 
 /*****************************************************************
@@ -226,137 +217,139 @@ restore(char *file)
  *
  *****************************************************************/
 
-# include "stdio.h"
+#include "stdio.h"
 
 /* Constants for key generation */
-# define OFFSET         667818
-# define MODULUS        894871
-# define MULT           2399
-# define ENCHAR         (((seed= ((seed*MULT+OFFSET)%MODULUS)) >> 10) & 0xff)
+#define OFFSET         667818
+#define MODULUS        894871
+#define MULT           2399
+#define ENCHAR         (((seed= ((seed*MULT+OFFSET)%MODULUS)) >> 10) & 0xff)
 
 /* Constants for checksumming */
-# define INITCK         1232531
-# define CKMOD          6506347
+#define INITCK         1232531
+#define CKMOD          6506347
 
-struct wb { int w1, w2, w3, w4; };
+struct wb {
+    int w1, w2, w3, w4;
+};
 
 /*****************************************************************
  * Encwrite: write a buffer to a file using data encryption
  *****************************************************************/
-size_t
-encwrite (void *vstart, size_t size, FILE *outf)
-{ int cksum = INITCK, seed, ch;
-  size_t savsiz;
-  char *stsav, *start = vstart;
+size_t encwrite(void *vstart, size_t size, FILE * outf)
+{
+    int cksum = INITCK, seed, ch;
+    size_t savsiz;
+    char *stsav, *start = vstart;
 
-  if ((outf == NULL) || (size == 0))
-          return(0);
+    if ((outf == NULL) || (size == 0))
+	return (0);
 
-  srand ((int)time (0) + md_getpid () + md_getuid ());  /* Build a random seed */
-  seed = (md_rand () & 0x7fff);
+    srand((int) time(0) + md_getpid() + md_getuid());	/* Build a random seed */
+    seed = (md_rand() & 0x7fff);
 
-  putword (seed, outf);                         /* Write the random seed */
-  putword ((int)size, outf);                            /* Write the file length */
+    putword(seed, outf);	/* Write the random seed */
+    putword((int) size, outf);	/* Write the file length */
 
-# ifdef DEBUG
-  fprintf (stderr, "Encwrite: size %ld, seed %ld.\n", size, seed);
-# endif
-
-  /* Now checksum, encrypt, and write out the buffer. */
-#if 0
-  /* This is the old way of doing it. */
-  while (size--)
-  { ch = *start++ & 0xff;                       /* Get the next char */
-    cksum = ((cksum << 8) + ch) % CKMOD;        /* Checksum clear text */
-    putc (ch ^ ENCHAR, outf);                   /* Write ciphertext */
-  } */
+#ifdef DEBUG
+    fprintf(stderr, "Encwrite: size %ld, seed %ld.\n", size, seed);
 #endif
-  /* And here's the new (and hopefully faster) way. */
 
-  savsiz = size;
-  stsav = start;
-  while (size--)
-  { ch = *start & 0xff;
-    cksum = ((cksum << 8) + ch) % CKMOD;
-    *start++ = (char)(ch ^ ENCHAR);
-  }
-  savsiz = fwrite(stsav, 1, savsiz, outf);
+    /* Now checksum, encrypt, and write out the buffer. */
+#if 0
+    /* This is the old way of doing it. */
+    while (size--) {
+	ch = *start++ & 0xff;	/* Get the next char */
+	cksum = ((cksum << 8) + ch) % CKMOD;	/* Checksum clear text */
+	putc(ch ^ ENCHAR, outf);	/* Write ciphertext */
+    }
+    */
+#endif
+	/* And here's the new (and hopefully faster) way. */
+	savsiz = size;
+    stsav = start;
+    while (size--) {
+	ch = *start & 0xff;
+	cksum = ((cksum << 8) + ch) % CKMOD;
+	*start++ = (char) (ch ^ ENCHAR);
+    }
+    savsiz = fwrite(stsav, 1, savsiz, outf);
 
-  putword (cksum, outf);                        /* Write out the checksum */
-  fflush (outf);                                /* Flush the output */
+    putword(cksum, outf);	/* Write out the checksum */
+    fflush(outf);		/* Flush the output */
 
-# ifdef DEBUG
-  fprintf (stderr, "Checksum is %ld.\n", cksum);
-# endif
-  return(savsiz);
+#ifdef DEBUG
+    fprintf(stderr, "Checksum is %ld.\n", cksum);
+#endif
+    return (savsiz);
 }
 
 /*****************************************************************
  * Encread: read a block of encrypted text from a file descriptor
  *****************************************************************/
-size_t
-encread (void *vstart, size_t size, FILE *infd)
-{ int cksum = INITCK, seed, ch;
-  size_t length, stored, cnt;
-  char *start = vstart;
+size_t encread(void *vstart, size_t size, FILE * infd)
+{
+    int cksum = INITCK, seed, ch;
+    size_t length, stored, cnt;
+    char *start = vstart;
 
-  if ((infd == NULL) || (size == 0))
-          return(0);
+    if ((infd == NULL) || (size == 0))
+	return (0);
 
-  seed = getword (infd);
-  stored = getword (infd);
+    seed = getword(infd);
+    stored = getword(infd);
 
-# ifdef DEBUG
-  fprintf (stderr, "Encread: size %ld, seed %ld, stored %ld.\n",
-           size, seed, stored);
-# endif
+#ifdef DEBUG
+    fprintf(stderr, "Encread: size %ld, seed %ld, stored %ld.\n",
+	    size, seed, stored);
+#endif
 
-  if ((length = fread (start, 1, min (size, stored), infd)) > 0)
-  { for (cnt = length; cnt--; )
-    { ch = (*start++ ^= ENCHAR) & 0xff;
-      cksum = ((cksum << 8) + ch) % CKMOD;
+    if ((length = fread(start, 1, min(size, stored), infd)) > 0) {
+	for (cnt = length; cnt--;) {
+	    ch = (*start++ ^= ENCHAR) & 0xff;
+	    cksum = ((cksum << 8) + ch) % CKMOD;
+	}
+
+	if ((length == stored) && (getword(infd) != cksum)) {
+#ifdef DEBUG
+	    fprintf(stderr, "Computed checksum %ld is wrong.\n", cksum);
+#else
+	    fprintf(stderr, "Sorry, file has been touched.\n");
+#endif
+	    while (length--)
+		*--start = '\0';	/* Zero the buffer */
+	}
     }
 
-    if ((length == stored) && (getword (infd) != cksum))
-    {
-# ifdef DEBUG
-      fprintf (stderr, "Computed checksum %ld is wrong.\n", cksum);
-# else
-      fprintf (stderr, "Sorry, file has been touched.\n");
-# endif
-      while (length--) *--start = '\0';         /* Zero the buffer */
-    }
-  }
-
-  return (length);
+    return (length);
 }
 
 /*****************************************************************
  * putword: Write out an encoded int word
  *****************************************************************/
 
-size_t
-putword (int word, FILE *file)
-{ struct wb w;
+size_t putword(int word, FILE * file)
+{
+    struct wb w;
 
-  w.w1 = rand ();
-  w.w2 = rand ();
-  w.w3 = rand ();
-  w.w4 = w.w1 ^ w.w2 ^ w.w3 ^ word;
+    w.w1 = rand();
+    w.w2 = rand();
+    w.w3 = rand();
+    w.w4 = w.w1 ^ w.w2 ^ w.w3 ^ word;
 
-  return fwrite ((char *) &w, sizeof (struct wb), 1, file);
+    return fwrite((char *) &w, sizeof(struct wb), 1, file);
 }
 
 /*****************************************************************
  * getword: Read in an encoded int word
  *****************************************************************/
 
-int
-getword (FILE *fd)
-{ struct wb w;
+int getword(FILE * fd)
+{
+    struct wb w;
 
-  if (fread ((char *) &w, 1, sizeof (struct wb),fd) == sizeof (struct wb))
-    return (w.w1 ^ w.w2 ^ w.w3 ^ w.w4);
-  else
-    return (0);
+    if (fread((char *) &w, 1, sizeof(struct wb), fd) == sizeof(struct wb))
+	return (w.w1 ^ w.w2 ^ w.w3 ^ w.w4);
+    else
+	return (0);
 }

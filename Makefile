@@ -65,6 +65,9 @@ tags: $(HDRS) $(CFILES)
 	ed - tags < :ctfix
 	sort tags -o tags
 
+indent:
+	sh indent.sh $(HDRS) $(CFILES)
+
 lint:
 	lint -hxbc $(CFILES) $(CRLIB) > linterrs
 

@@ -50,7 +50,7 @@
 #include "mdport.h"
 
 #ifdef HAVE_CURSES_H
-#include <curses.h> /* AIX requires curses.h be included before term.h */
+#include <curses.h>		/* AIX requires curses.h be included before term.h */
 #endif
 
 #if defined(HAVE_SYS_TYPES)
@@ -70,7 +70,7 @@
 #endif
 
 #if defined(HAVE_ARPA_INET_H)
-#include <arpa/inet.h> /* Solaris 2.8 required this for htonl() and ntohl() */
+#include <arpa/inet.h>		/* Solaris 2.8 required this for htonl() and ntohl() */
 #endif
 
 #if defined(HAVE_TERMIOS_H)
@@ -113,8 +113,7 @@
 
 #define NOOP(x) (x += 0)
 
-void
-md_init()
+void md_init()
 {
 #if defined(__INTERIX)
     char *term;
@@ -122,7 +121,7 @@ md_init()
     term = getenv("TERM");
 
     if (term == NULL)
-        setenv("TERM","interix");
+	setenv("TERM", "interix");
 #elif defined(__DJGPP__)
     _fmode = _O_BINARY;
 #elif defined(_WIN32)
@@ -130,18 +129,17 @@ md_init()
 #endif
 
 #if defined(HAVE_ESCDELAY)
-    ESCDELAY=64;
+    ESCDELAY = 64;
 #endif
 
 #if defined(DUMP)
-        md_onsignal_default();
+    md_onsignal_default();
 #else
-        md_onsignal_exit();
+    md_onsignal_exit();
 #endif
 }
 
-void
-md_onsignal_default()
+void md_onsignal_default()
 {
 #ifdef SIGHUP
     signal(SIGHUP, SIG_DFL);
@@ -178,8 +176,7 @@ md_onsignal_default()
 #endif
 }
 
-void
-md_onsignal_exit()
+void md_onsignal_exit()
 {
 #ifdef SIGHUP
     signal(SIGHUP, SIG_DFL);
@@ -222,14 +219,13 @@ extern void auto_save(int sig);
 extern void endit(int sig);
 extern void quit(int sig);
 
-void
-md_onsignal_autosave()
+void md_onsignal_autosave()
 {
 #ifdef SIGHUP
     signal(SIGHUP, auto_save);
 #endif
 #ifdef SIGQUIT
-        signal(SIGQUIT, endit);
+    signal(SIGQUIT, endit);
 #endif
 #ifdef SIGILL
     signal(SIGILL, auto_save);
@@ -264,30 +260,28 @@ md_onsignal_autosave()
 }
 #endif
 
-int
-md_hasclreol()
+int md_hasclreol()
 {
 #if defined(clr_eol)
 #ifdef NCURSES_VERSION
     if (cur_term == NULL)
-        return(0);
+	return (0);
     /*
-    if (cur_term->type.Strings == NULL)
-        return(0);
-        */
+       if (cur_term->type.Strings == NULL)
+       return(0);
+     */
 #endif
-    return((clr_eol != NULL) && (*clr_eol != 0));
+    return ((clr_eol != NULL) && (*clr_eol != 0));
 #elif defined(__PDCURSES__)
-    return(TRUE);
+    return (TRUE);
 #elif defined(HAVE_TERM_H)
-    return((CE != NULL) && (*CE != 0));
+    return ((CE != NULL) && (*CE != 0));
 #else
-        return(0);
+    return (0);
 #endif
 }
 
-void
-md_putchar(int c)
+void md_putchar(int c)
 {
     putchar(c);
 }
@@ -296,103 +290,95 @@ md_putchar(int c)
 static int md_standout_mode = 0;
 #endif
 
-void
-md_raw_standout()
+void md_raw_standout()
 {
 #ifdef _WIN32
     CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
     HANDLE hStdout;
-    WORD fgattr,bgattr;
+    WORD fgattr, bgattr;
 
-    if (md_standout_mode == 0)
-    {
-        hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
-        GetConsoleScreenBufferInfo(hStdout, &csbiInfo);
-        fgattr = (csbiInfo.wAttributes & 0xF);
-        bgattr = (csbiInfo.wAttributes & 0xF0);
-        SetConsoleTextAttribute(hStdout,(fgattr << 4) | (bgattr >> 4));
-        md_standout_mode = 1;
+    if (md_standout_mode == 0) {
+	hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
+	GetConsoleScreenBufferInfo(hStdout, &csbiInfo);
+	fgattr = (csbiInfo.wAttributes & 0xF);
+	bgattr = (csbiInfo.wAttributes & 0xF0);
+	SetConsoleTextAttribute(hStdout, (fgattr << 4) | (bgattr >> 4));
+	md_standout_mode = 1;
     }
 #elif defined(SO)
-    tputs(SO,0,md_putchar);
+    tputs(SO, 0, md_putchar);
     fflush(stdout);
 #endif
 }
 
-void
-md_raw_standend()
+void md_raw_standend()
 {
 #ifdef _WIN32
     CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
     HANDLE hStdout;
-    WORD fgattr,bgattr;
+    WORD fgattr, bgattr;
 
-    if (md_standout_mode == 1)
-    {
-        hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
-        GetConsoleScreenBufferInfo(hStdout, &csbiInfo);
-        fgattr = (csbiInfo.wAttributes & 0xF);
-        bgattr = (csbiInfo.wAttributes & 0xF0);
-        SetConsoleTextAttribute(hStdout,(fgattr << 4) | (bgattr >> 4));
-        md_standout_mode = 0;
+    if (md_standout_mode == 1) {
+	hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
+	GetConsoleScreenBufferInfo(hStdout, &csbiInfo);
+	fgattr = (csbiInfo.wAttributes & 0xF);
+	bgattr = (csbiInfo.wAttributes & 0xF0);
+	SetConsoleTextAttribute(hStdout, (fgattr << 4) | (bgattr >> 4));
+	md_standout_mode = 0;
     }
 #elif defined(SE)
-    tputs(SE,0,md_putchar);
+    tputs(SE, 0, md_putchar);
     fflush(stdout);
 #endif
 }
 
-int
-md_unlink_open_file(char *file, FILE *inf)
+int md_unlink_open_file(char *file, FILE * inf)
 {
 #ifdef _WIN32
     fclose(inf);
     _chmod(file, 0600);
-    return( _unlink(file) );
+    return (_unlink(file));
 #else
-    return(unlink(file));
+    return (unlink(file));
 #endif
 }
 
-int
-md_unlink(char *file)
+int md_unlink(char *file)
 {
 #ifdef _WIN32
     _chmod(file, 0600);
-    return( _unlink(file) );
+    return (_unlink(file));
 #else
-    return(unlink(file));
+    return (unlink(file));
 #endif
 }
 
-int
-md_chmod(char *filename, int mode)
+int md_chmod(char *filename, int mode)
 {
 #ifdef _WIN32
-    return( _chmod(filename, mode) );
+    return (_chmod(filename, mode));
 #else
-    return( chmod(filename, mode) );
+    return (chmod(filename, mode));
 #endif
 }
 
-void
-md_normaluser()
+void md_normaluser()
 {
 #if defined(HAVE_GETGID) && defined(HAVE_GETUID)
-        gid_t realgid = getgid();
-        uid_t realuid = getuid();
+    gid_t realgid = getgid();
+    uid_t realuid = getuid();
 
 #if defined(HAVE_SETRESGID)
     if (setresgid(-1, realgid, realgid) != 0) {
 #elif defined (HAVE_SETREGID)
     if (setregid(realgid, realgid) != 0) {
 #elif defined (HAVE_SETGID)
-        if (setgid(realgid) != 0) {
+    if (setgid(realgid) != 0) {
 #else
-        if (0) {
+    if (0) {
 #endif
-                perror("Could not drop setgid privileges.  Aborting.");
-                exit(1);
+	perror("Could not drop setgid privileges.  Aborting.");
+	exit(1);
     }
 
 #if defined(HAVE_SETRESUID)
@@ -400,38 +386,35 @@ md_normaluser()
 #elif defined(HAVE_SETREUID)
     if (setreuid(realuid, realuid) != 0) {
 #elif defined(HAVE_SETUID)
-        if (setuid(realuid) != 0) {
+    if (setuid(realuid) != 0) {
 #else
-        if (0) {
+    if (0) {
 #endif
-        perror("Could not drop setuid privileges.  Aborting.");
-        exit(1);
+	perror("Could not drop setuid privileges.  Aborting.");
+	exit(1);
     }
 #endif
 }
 
-int
-md_getuid()
+int md_getuid()
 {
 #ifdef HAVE_GETUID
-    return( getuid() );
+    return (getuid());
 #else
-    return(42);
+    return (42);
 #endif
 }
 
-int
-md_getpid()
+int md_getpid()
 {
 #ifdef _WIN32
-    return( _getpid() );
+    return (_getpid());
 #else
-    return( getpid() );
+    return (getpid());
 #endif
 }
 
-char *
-md_getusername()
+char *md_getusername()
 {
     static char login[80];
     char *l = NULL;
@@ -441,7 +424,7 @@ md_getusername()
     TCHAR buffer[UNLEN + 1];
 
     mybuffer = buffer;
-    GetUserName(mybuffer,&size);
+    GetUserName(mybuffer, &size);
     l = mybuffer;
 #elif defined(HAVE_GETPWUID)&& !defined(__DJGPP__)
     struct passwd *pw;
@@ -452,19 +435,18 @@ md_getusername()
 #endif
 
     if ((l == NULL) || (*l == '\0'))
-        if ( (l = getenv("USERNAME")) == NULL )
-            if ( (l = getenv("LOGNAME")) == NULL )
-                if ( (l = getenv("USER")) == NULL )
-                    l = "nobody";
+	if ((l = getenv("USERNAME")) == NULL)
+	    if ((l = getenv("LOGNAME")) == NULL)
+		if ((l = getenv("USER")) == NULL)
+		    l = "nobody";
 
-    strncpy(login,l,80);
+    strncpy(login, l, 80);
     login[79] = 0;
 
-    return(login);
+    return (login);
 }
 
-char *
-md_gethomedir()
+char *md_gethomedir()
 {
     static char homedir[PATH_MAX];
     char *h = NULL;
@@ -473,7 +455,7 @@ md_gethomedir()
     TCHAR szPath[PATH_MAX];
 #endif
 #if defined(_WIN32) || defined(DJGPP)
-        char slash = '\\';
+    char slash = '\\';
 #else
     char slash = '/';
     struct passwd *pw;
@@ -481,47 +463,43 @@ md_gethomedir()
 
     h = pw->pw_dir;
 
-    if (strcmp(h,"/") == 0)
-        h = NULL;
+    if (strcmp(h, "/") == 0)
+	h = NULL;
 #endif
     homedir[0] = 0;
 #ifdef _WIN32
-    if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, szPath)))
-        h = szPath;
+    if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, szPath)))
+	h = szPath;
 #endif
 
-    if ( (h == NULL) || (*h == '\0') )
-    {
-        if ( (h = getenv("HOME")) == NULL )
-        {
-            if ( (h = getenv("HOMEDRIVE")) == NULL)
-                h = "";
-            else
-            {
-                strncpy(homedir,h,PATH_MAX-1);
-                homedir[PATH_MAX-1] = 0;
+    if ((h == NULL) || (*h == '\0')) {
+	if ((h = getenv("HOME")) == NULL) {
+	    if ((h = getenv("HOMEDRIVE")) == NULL)
+		h = "";
+	    else {
+		strncpy(homedir, h, PATH_MAX - 1);
+		homedir[PATH_MAX - 1] = 0;
 
-                if ( (h = getenv("HOMEPATH")) == NULL)
-                    h = "";
-            }
-        }
+		if ((h = getenv("HOMEPATH")) == NULL)
+		    h = "";
+	    }
+	}
     }
 
 
     len = strlen(homedir);
-    strncat(homedir,h,PATH_MAX-len-1);
+    strncat(homedir, h, PATH_MAX - len - 1);
     len = strlen(homedir);
 
-    if ((len > 0) && (homedir[len-1] != slash)) {
-        homedir[len] = slash;
-        homedir[len+1] = 0;
+    if ((len > 0) && (homedir[len - 1] != slash)) {
+	homedir[len] = slash;
+	homedir[len + 1] = 0;
     }
 
-    return(homedir);
+    return (homedir);
 }
 
-void
-md_sleep(int s)
+void md_sleep(int s)
 {
 #ifdef _WIN32
     Sleep(s);
@@ -530,18 +508,16 @@ md_sleep(int s)
 #endif
 }
 
-int
-md_exec(const char *path, const char *arg0, const char *arg1)
+int md_exec(const char *path, const char *arg0, const char *arg1)
 {
 #ifdef _WIN32
-    return (int) _execl(path,arg0,arg1,NULL);
+    return (int) _execl(path, arg0, arg1, NULL);
 #else
-    return execl(path,arg0,arg1,NULL);
+    return execl(path, arg0, arg1, NULL);
 #endif
 }
 
-char *
-md_getshell()
+char *md_getshell()
 {
     static char shell[PATH_MAX];
     char *s = NULL;
@@ -556,19 +532,18 @@ md_getshell()
     s = pw->pw_shell;
 #endif
     if ((s == NULL) || (*s == '\0'))
-        if ( (s = getenv("COMSPEC")) == NULL)
-            if ( (s = getenv("SHELL")) == NULL)
-                if ( (s = getenv("SystemRoot")) == NULL)
-                    s = def;
+	if ((s = getenv("COMSPEC")) == NULL)
+	    if ((s = getenv("SHELL")) == NULL)
+		if ((s = getenv("SystemRoot")) == NULL)
+		    s = def;
 
-    strncpy(shell,s,PATH_MAX);
-    shell[PATH_MAX-1] = 0;
+    strncpy(shell, s, PATH_MAX);
+    shell[PATH_MAX - 1] = 0;
 
-    return(shell);
+    return (shell);
 }
 
-int
-md_shellescape()
+int md_shellescape()
 {
 #if defined(HAVE_WORKING_FORK)
     int ret_status = -1;
@@ -579,84 +554,75 @@ md_shellescape()
 
     sh = md_getshell();
 
-    while((pid = fork()) < 0)
-        sleep(1);
+    while ((pid = fork()) < 0)
+	sleep(1);
 
-    if (pid == 0) /* Shell Process */
-    {
-        /*
-         * Set back to original user, just in case
-         */
-        md_normaluser();
-        execl(sh == NULL ? "/bin/sh" : sh, "shell", "-i", NULL);
-        perror("No shelly");
-        _exit(-1);
-    }
-    else /* Application */
-    {
-        myend = signal(SIGINT, SIG_IGN);
+    if (pid == 0) {		/* Shell Process */
+	/*
+	 * Set back to original user, just in case
+	 */
+	md_normaluser();
+	execl(sh == NULL ? "/bin/sh" : sh, "shell", "-i", NULL);
+	perror("No shelly");
+	_exit(-1);
+    } else {			/* Application */
+	myend = signal(SIGINT, SIG_IGN);
 #ifdef SIGQUIT
-        myquit = signal(SIGQUIT, SIG_IGN);
+	myquit = signal(SIGQUIT, SIG_IGN);
 #endif
-        while (wait(&ret_status) != pid)
-            continue;
+	while (wait(&ret_status) != pid)
+	    continue;
 
-        signal(SIGINT, myquit);
+	signal(SIGINT, myquit);
 #ifdef SIGQUIT
-        signal(SIGQUIT, myend);
+	signal(SIGQUIT, myend);
 #endif
     }
-    return(ret_status);
+    return (ret_status);
 #elif defined(HAVE__SPAWNL)
-    return((int)_spawnl(_P_WAIT,md_getshell(),"shell",NULL,0));
+    return ((int) _spawnl(_P_WAIT, md_getshell(), "shell", NULL, 0));
 #elif defined(HAVE_SPAWNL)
-    return ( spawnl(P_WAIT,md_getshell(),"shell",NULL,0) );
+    return (spawnl(P_WAIT, md_getshell(), "shell", NULL, 0));
 #else
-        return(0);
+    return (0);
 #endif
 }
 
-int
-directory_exists(char *dirname)
+int directory_exists(char *dirname)
 {
     struct stat sb;
 
-    if (stat(dirname, &sb) == 0) /* path exists */
-        return (sb.st_mode & S_IFDIR);
+    if (stat(dirname, &sb) == 0)	/* path exists */
+	return (sb.st_mode & S_IFDIR);
 
-    return(0);
+    return (0);
 }
 
-char *
-md_getrealname(int uid)
+char *md_getrealname(int uid)
 {
     static char uidstr[20];
 #if !defined(_WIN32) && !defined(DJGPP)
     struct passwd *pp;
 
-        if ((pp = getpwuid(uid)) == NULL)
-    {
-        sprintf(uidstr,"%d", uid);
-        return(uidstr);
-    }
-        else
-            return(pp->pw_name);
+    if ((pp = getpwuid(uid)) == NULL) {
+	sprintf(uidstr, "%d", uid);
+	return (uidstr);
+    } else
+	return (pp->pw_name);
 #else
-   sprintf(uidstr,"%d", uid);
-   return(uidstr);
+    sprintf(uidstr, "%d", uid);
+    return (uidstr);
 #endif
 }
 
 extern char *xcrypt(char *key, char *salt);
 
-char *
-md_crypt(char *key, char *salt)
+char *md_crypt(char *key, char *salt)
 {
-    return( xcrypt(key,salt) );
+    return (xcrypt(key, salt));
 }
 
-char *
-md_getpass(char *prompt)
+char *md_getpass(char *prompt)
 {
 #ifndef HAVE_GETPASS
     static char password_buffer[9];
@@ -666,67 +632,62 @@ md_getpass(char *prompt)
 
     fflush(stdout);
     /* If we can't prompt, abort */
-    if (fputs(prompt, stderr) < 0)
-    {
-        *p = '\0';
-        return NULL;
+    if (fputs(prompt, stderr) < 0) {
+	*p = '\0';
+	return NULL;
     }
 
-    for(;;)
-    {
-        /* Get a character with no echo */
-        c = _getch();
+    for (;;) {
+	/* Get a character with no echo */
+	c = _getch();
 
-        /* Exit on interrupt (^c or ^break) */
-        if (c == '\003' || c == 0x100)
-            exit(1);
+	/* Exit on interrupt (^c or ^break) */
+	if (c == '\003' || c == 0x100)
+	    exit(1);
 
-        /* Terminate on end of line or file (^j, ^m, ^d, ^z) */
-        if (c == '\r' || c == '\n' || c == '\004' || c == '\032')
-            break;
+	/* Terminate on end of line or file (^j, ^m, ^d, ^z) */
+	if (c == '\r' || c == '\n' || c == '\004' || c == '\032')
+	    break;
 
-        /* Back up on backspace */
-        if (c == '\b')
-        {
-            if (count)
-                count--;
-            else if (p > password_buffer)
-                p--;
-            continue;
-        }
+	/* Back up on backspace */
+	if (c == '\b') {
+	    if (count)
+		count--;
+	    else if (p > password_buffer)
+		p--;
+	    continue;
+	}
 
-        /* Ignore DOS extended characters */
-        if ((c & 0xff) != c)
-            continue;
+	/* Ignore DOS extended characters */
+	if ((c & 0xff) != c)
+	    continue;
 
-        /* Add to password if it isn't full */
-        if (p < password_buffer + max_length - 1)
-            *p++ = (char) c;
-        else
-            count++;
+	/* Add to password if it isn't full */
+	if (p < password_buffer + max_length - 1)
+	    *p++ = (char) c;
+	else
+	    count++;
     }
-   *p = '\0';
+    *p = '\0';
 
-   fputc('\n', stderr);
+    fputc('\n', stderr);
 
-   return password_buffer;
+    return password_buffer;
 #else
-   return( (char *) getpass(prompt) );
+    return ((char *) getpass(prompt));
 #endif
 }
 
-int
-md_rand()
+int md_rand()
 {
 #ifdef _WIN32
-    return(rand());
+    return (rand());
 #else
-    return(lrand48() & 0x7fffffff);
+    return (lrand48() & 0x7fffffff);
 #endif
 }
 
-void
-md_srand(int seed)
+void md_srand(int seed)
 {
 #ifdef _WIN32
     srand(seed);
@@ -735,17 +696,18 @@ md_srand(int seed)
 #endif
 }
 
-unsigned long
-md_memused()
+unsigned long md_memused()
 {
 #ifdef __APPLE__
     /* Taken from http://blog.kuriositaet.de/?p=257 */
     struct task_basic_info t_info;
     mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
 
-    if (KERN_SUCCESS != task_info(mach_task_self(), TASK_BASIC_INFO, (task_info_t)&t_info, &t_info_count)) {
-        /* We can't return -1 since our return type is unsigned. */
-        return 0;
+    if (KERN_SUCCESS !=
+	task_info(mach_task_self(), TASK_BASIC_INFO,
+		  (task_info_t) & t_info, &t_info_count)) {
+	/* We can't return -1 since our return type is unsigned. */
+	return 0;
     }
 
     return t_info.virtual_size;
@@ -755,15 +717,14 @@ md_memused()
 
     GlobalMemoryStatus(&stat);
 
-    return((unsigned long)stat.dwTotalPageFile);
+    return ((unsigned long) stat.dwTotalPageFile);
 #else
-    return( (unsigned long) sbrk(0) );
+    return ((unsigned long) sbrk(0));
 #endif
 #endif
 }
 
-char *
-md_gethostname()
+char *md_gethostname()
 {
     static char nodename[80];
     char *n = NULL;
@@ -771,69 +732,65 @@ md_gethostname()
     struct utsname ourname;
 
     if (uname(&ourname) == 0)
-        n = ourname.nodename;
+	n = ourname.nodename;
 #endif
     if ((n == NULL) || (*n == '\0'))
-        if ( (n = getenv("COMPUTERNAME")) == NULL)
-            if ( (n = getenv("HOSTNAME")) == NULL)
-                n = "localhost";
+	if ((n = getenv("COMPUTERNAME")) == NULL)
+	    if ((n = getenv("HOSTNAME")) == NULL)
+		n = "localhost";
 
     strncpy(nodename, n, 80);
     nodename[79] = 0;
 
-    return(nodename);
+    return (nodename);
 }
 
-int
-md_erasechar()
+int md_erasechar()
 {
 #ifdef BSD
-    return(_tty.sg_erase); /* process erase character */
+    return (_tty.sg_erase);	/* process erase character */
 #elif defined(USG5_0)
-    return(_tty.c_cc[VERASE]); /* process erase character */
-#elif defined(HAVE_CURSES_H) /* USG5_2 .... curses */
-    return( erasechar() ); /* process erase character */
+    return (_tty.c_cc[VERASE]);	/* process erase character */
+#elif defined(HAVE_CURSES_H)	/* USG5_2 .... curses */
+    return (erasechar());	/* process erase character */
 #else
-        return(0);
+    return (0);
 #endif
 }
 
-int
-md_killchar()
+int md_killchar()
 {
 #ifdef BSD
-    return(_tty.sg_kill);
+    return (_tty.sg_kill);
 #elif defined(USG5_0)
-    return(_tty.c_cc[VKILL]);
-#elif defined(HAVE_CURSES_H) /* USG5_2 ..... curses */
-    return( killchar() );
+    return (_tty.c_cc[VKILL]);
+#elif defined(HAVE_CURSES_H)	/* USG5_2 ..... curses */
+    return (killchar());
 #else
-        return(0);
+    return (0);
 #endif
 }
 
-int
-md_dsuspchar()
+int md_dsuspchar()
 {
-#if defined(VDSUSP)                     /* POSIX has priority */
+#if defined(VDSUSP)		/* POSIX has priority */
     struct termios attr;
     tcgetattr(STDIN_FILENO, &attr);
-    return( attr.c_cc[VDSUSP] );
+    return (attr.c_cc[VDSUSP]);
 #elif defined(TIOCGLTC)
     struct ltchars ltc;
     ioctl(1, TIOCGLTC, &ltc);
-    return(ltc.t_dsuspc);
+    return (ltc.t_dsuspc);
 #elif defined(_POSIX_VDISABLE)
-    return(_POSIX_VDISABLE);
+    return (_POSIX_VDISABLE);
 #else
-    return(0);
+    return (0);
 #endif
 }
 
-int
-md_setdsuspchar(int c)
+int md_setdsuspchar(int c)
 {
-#if defined(VDSUSP)                     /* POSIX has priority */
+#if defined(VDSUSP)		/* POSIX has priority */
     struct termios attr;
     tcgetattr(STDIN_FILENO, &attr);
     attr.c_cc[VDSUSP] = c;
@@ -846,31 +803,29 @@ md_setdsuspchar(int c)
 #else
     NOOP(c);
 #endif
-    return(0);
+    return (0);
 }
 
-int
-md_suspchar()
+int md_suspchar()
 {
-#if defined(VSUSP)                      /* POSIX has priority */
+#if defined(VSUSP)		/* POSIX has priority */
     struct termios attr;
     tcgetattr(STDIN_FILENO, &attr);
-    return( attr.c_cc[VSUSP] );
+    return (attr.c_cc[VSUSP]);
 #elif defined(TIOCGLTC)
     struct ltchars ltc;
     ioctl(1, TIOCGLTC, &ltc);
-    return(ltc.t_suspc);
+    return (ltc.t_suspc);
 #elif defined(_POSIX_VDISABLE)
-    return(_POSIX_VDISABLE);
+    return (_POSIX_VDISABLE);
 #else
-    return(0);
+    return (0);
 #endif
 }
 
-int
-md_setsuspchar(int c)
+int md_setsuspchar(int c)
 {
-#if defined(VSUSP)                      /* POSIX has priority */
+#if defined(VSUSP)		/* POSIX has priority */
     struct termios attr;
     tcgetattr(STDIN_FILENO, &attr);
     attr.c_cc[VSUSP] = c;
@@ -884,7 +839,7 @@ md_setsuspchar(int c)
     NOOP(c);
 #endif
 
-    return(0);
+    return (0);
 }
 
 /*
@@ -1178,243 +1133,452 @@ md_setsuspchar(int c)
 #endif
 
 #ifdef HAVE_CURSES_H
-int
-md_readchar(WINDOW *win)
+int md_readchar(WINDOW * win)
 {
     int ch = 0;
     int lastch = 0;
     int mode = M_NORMAL;
     int mode2 = M_NORMAL;
 
-    for(;;)
-    {
-        ch = wgetch(win);
+    for (;;) {
+	ch = wgetch(win);
 
-        if (ch == ERR)      /* timed out waiting for valid sequence */
-        {                   /* flush input so far and start over    */
-            nocbreak();
-            raw();
-            ch = 27;
-            break;
-        }
+	if (ch == ERR) {	/* timed out waiting for valid sequence */
+	    /* flush input so far and start over    */
+	    nocbreak();
+	    raw();
+	    ch = 27;
+	    break;
+	}
 
-        if (mode == M_TRAIL)
-        {
-            if (ch == '^')              /* msys console  : 7,5,6,8: modified*/
-                ch = CTRL( toupper(lastch) );
+	if (mode == M_TRAIL) {
+	    if (ch == '^')	/* msys console  : 7,5,6,8: modified */
+		ch = CTRL(toupper(lastch));
 
-            if (ch == '~')              /* cygwin console: 1,5,6,4: normal  */
-                ch = tolower(lastch);   /* windows telnet: 1,5,6,4: normal  */
-                                        /* msys console  : 7,5,6,8: normal  */
+	    if (ch == '~')	/* cygwin console: 1,5,6,4: normal  */
+		ch = tolower(lastch);	/* windows telnet: 1,5,6,4: normal  */
+	    /* msys console  : 7,5,6,8: normal  */
 
-            if (mode2 == M_ESC)         /* cygwin console: 1,5,6,4: modified*/
-                ch = CTRL( toupper(ch) );
+	    if (mode2 == M_ESC)	/* cygwin console: 1,5,6,4: modified */
+		ch = CTRL(toupper(ch));
 
-            break;
-        }
+	    break;
+	}
 
-        if (mode == M_ESC)
-        {
-            if (ch == 27)
-            {
-                mode2 = M_ESC;
-                continue;
-            }
+	if (mode == M_ESC) {
+	    if (ch == 27) {
+		mode2 = M_ESC;
+		continue;
+	    }
 
-            if ((ch == 'F') || (ch == 'O') || (ch == '['))
-            {
-                mode = M_KEYPAD;
-                continue;
-            }
+	    if ((ch == 'F') || (ch == 'O') || (ch == '[')) {
+		mode = M_KEYPAD;
+		continue;
+	    }
 
 
-            switch(ch)
-            {
-                /* Cygwin Console   */
-                /* PuTTY            */
-                case KEY_LEFT : ch = CTRL('H'); break;
-                case KEY_RIGHT: ch = CTRL('L'); break;
-                case KEY_UP   : ch = CTRL('K'); break;
-                case KEY_DOWN : ch = CTRL('J'); break;
-                case KEY_HOME : ch = CTRL('Y'); break;
-                case KEY_PPAGE: ch = CTRL('U'); break;
-                case KEY_NPAGE: ch = CTRL('N'); break;
-                case KEY_END  : ch = CTRL('B'); break;
+	    switch (ch) {
+		/* Cygwin Console   */
+		/* PuTTY            */
+	    case KEY_LEFT:
+		ch = CTRL('H');
+		break;
+	    case KEY_RIGHT:
+		ch = CTRL('L');
+		break;
+	    case KEY_UP:
+		ch = CTRL('K');
+		break;
+	    case KEY_DOWN:
+		ch = CTRL('J');
+		break;
+	    case KEY_HOME:
+		ch = CTRL('Y');
+		break;
+	    case KEY_PPAGE:
+		ch = CTRL('U');
+		break;
+	    case KEY_NPAGE:
+		ch = CTRL('N');
+		break;
+	    case KEY_END:
+		ch = CTRL('B');
+		break;
 
-                default: break;
-            }
+	    default:
+		break;
+	    }
 
-            break;
-        }
+	    break;
+	}
 
-        if (mode == M_KEYPAD)
-        {
-            switch(ch)
-            {
-                /* ESC F - Interix Console codes */
-                case   '^': ch = CTRL('H'); break;      /* Shift-Left       */
-                case   '$': ch = CTRL('L'); break;      /* Shift-Right      */
+	if (mode == M_KEYPAD) {
+	    switch (ch) {
+		/* ESC F - Interix Console codes */
+	    case '^':
+		ch = CTRL('H');
+		break;		/* Shift-Left       */
+	    case '$':
+		ch = CTRL('L');
+		break;		/* Shift-Right      */
 
-                /* ESC [ - Interix Console codes */
-                case   'H': ch = 'y'; break;            /* Home             */
-                case     1: ch = CTRL('K'); break;      /* Ctl-Keypad Up    */
-                case     2: ch = CTRL('J'); break;      /* Ctl-Keypad Down  */
-                case     3: ch = CTRL('L'); break;      /* Ctl-Keypad Right */
-                case     4: ch = CTRL('H'); break;      /* Ctl-Keypad Left  */
-                case   263: ch = CTRL('Y'); break;      /* Ctl-Keypad Home  */
-                case    19: ch = CTRL('U'); break;      /* Ctl-Keypad PgUp  */
-                case    20: ch = CTRL('N'); break;      /* Ctl-Keypad PgDn  */
-                case    21: ch = CTRL('B'); break;      /* Ctl-Keypad End   */
+		/* ESC [ - Interix Console codes */
+	    case 'H':
+		ch = 'y';
+		break;		/* Home             */
+	    case 1:
+		ch = CTRL('K');
+		break;		/* Ctl-Keypad Up    */
+	    case 2:
+		ch = CTRL('J');
+		break;		/* Ctl-Keypad Down  */
+	    case 3:
+		ch = CTRL('L');
+		break;		/* Ctl-Keypad Right */
+	    case 4:
+		ch = CTRL('H');
+		break;		/* Ctl-Keypad Left  */
+	    case 263:
+		ch = CTRL('Y');
+		break;		/* Ctl-Keypad Home  */
+	    case 19:
+		ch = CTRL('U');
+		break;		/* Ctl-Keypad PgUp  */
+	    case 20:
+		ch = CTRL('N');
+		break;		/* Ctl-Keypad PgDn  */
+	    case 21:
+		ch = CTRL('B');
+		break;		/* Ctl-Keypad End   */
 
-                /* ESC [ - Cygwin Console codes */
-                case   'G': ch = '.'; break;            /* Keypad 5         */
-                case   '7': lastch = 'Y'; mode=M_TRAIL; break;  /* Ctl-Home */
-                case   '5': lastch = 'U'; mode=M_TRAIL; break;  /* Ctl-PgUp */
-                case   '6': lastch = 'N'; mode=M_TRAIL; break;  /* Ctl-PgDn */
+		/* ESC [ - Cygwin Console codes */
+	    case 'G':
+		ch = '.';
+		break;		/* Keypad 5         */
+	    case '7':
+		lastch = 'Y';
+		mode = M_TRAIL;
+		break;		/* Ctl-Home */
+	    case '5':
+		lastch = 'U';
+		mode = M_TRAIL;
+		break;		/* Ctl-PgUp */
+	    case '6':
+		lastch = 'N';
+		mode = M_TRAIL;
+		break;		/* Ctl-PgDn */
 
-                /* ESC [ - Win32 Telnet, PuTTY */
-                case   '1': lastch = 'y'; mode=M_TRAIL; break;  /* Home     */
-                case   '4': lastch = 'b'; mode=M_TRAIL; break;  /* End      */
+		/* ESC [ - Win32 Telnet, PuTTY */
+	    case '1':
+		lastch = 'y';
+		mode = M_TRAIL;
+		break;		/* Home     */
+	    case '4':
+		lastch = 'b';
+		mode = M_TRAIL;
+		break;		/* End      */
 
-                /* ESC O - PuTTY */
-                case   'D': ch = CTRL('H'); break;
-                case   'C': ch = CTRL('L'); break;
-                case   'A': ch = CTRL('K'); break;
-                case   'B': ch = CTRL('J'); break;
-                case   't': ch = 'h'; break;
-                case   'v': ch = 'l'; break;
-                case   'x': ch = 'k'; break;
-                case   'r': ch = 'j'; break;
-                case   'w': ch = 'y'; break;
-                case   'y': ch = 'u'; break;
-                case   's': ch = 'n'; break;
-                case   'q': ch = 'b'; break;
-                case   'u': ch = '.'; break;
-            }
+		/* ESC O - PuTTY */
+	    case 'D':
+		ch = CTRL('H');
+		break;
+	    case 'C':
+		ch = CTRL('L');
+		break;
+	    case 'A':
+		ch = CTRL('K');
+		break;
+	    case 'B':
+		ch = CTRL('J');
+		break;
+	    case 't':
+		ch = 'h';
+		break;
+	    case 'v':
+		ch = 'l';
+		break;
+	    case 'x':
+		ch = 'k';
+		break;
+	    case 'r':
+		ch = 'j';
+		break;
+	    case 'w':
+		ch = 'y';
+		break;
+	    case 'y':
+		ch = 'u';
+		break;
+	    case 's':
+		ch = 'n';
+		break;
+	    case 'q':
+		ch = 'b';
+		break;
+	    case 'u':
+		ch = '.';
+		break;
+	    }
 
-            if (mode != M_KEYPAD)
-                continue;
-        }
+	    if (mode != M_KEYPAD)
+		continue;
+	}
 
-        if (ch == 27)
-        {
-            halfdelay(1);
-            mode = M_ESC;
-            continue;
-        }
+	if (ch == 27) {
+	    halfdelay(1);
+	    mode = M_ESC;
+	    continue;
+	}
 
-        switch(ch)
-        {
-            case KEY_LEFT   : ch = 'h'; break;
-            case KEY_DOWN   : ch = 'j'; break;
-            case KEY_UP     : ch = 'k'; break;
-            case KEY_RIGHT  : ch = 'l'; break;
-            case KEY_HOME   : ch = 'y'; break;
-            case KEY_PPAGE  : ch = 'u'; break;
-            case KEY_END    : ch = 'b'; break;
+	switch (ch) {
+	case KEY_LEFT:
+	    ch = 'h';
+	    break;
+	case KEY_DOWN:
+	    ch = 'j';
+	    break;
+	case KEY_UP:
+	    ch = 'k';
+	    break;
+	case KEY_RIGHT:
+	    ch = 'l';
+	    break;
+	case KEY_HOME:
+	    ch = 'y';
+	    break;
+	case KEY_PPAGE:
+	    ch = 'u';
+	    break;
+	case KEY_END:
+	    ch = 'b';
+	    break;
 #ifdef KEY_LL
-            case KEY_LL     : ch = 'b'; break;
+	case KEY_LL:
+	    ch = 'b';
+	    break;
 #endif
-            case KEY_NPAGE  : ch = 'n'; break;
+	case KEY_NPAGE:
+	    ch = 'n';
+	    break;
 
 #ifdef KEY_B1
-            case KEY_B1     : ch = 'h'; break;
-            case KEY_C2     : ch = 'j'; break;
-            case KEY_A2     : ch = 'k'; break;
-            case KEY_B3     : ch = 'l'; break;
+	case KEY_B1:
+	    ch = 'h';
+	    break;
+	case KEY_C2:
+	    ch = 'j';
+	    break;
+	case KEY_A2:
+	    ch = 'k';
+	    break;
+	case KEY_B3:
+	    ch = 'l';
+	    break;
 #endif
-            case KEY_A1     : ch = 'y'; break;
-            case KEY_A3     : ch = 'u'; break;
-            case KEY_C1     : ch = 'b'; break;
-            case KEY_C3     : ch = 'n'; break;
-            /* next should be '.', but for problem with putty/linux */
-            case KEY_B2     : ch = 'u'; break;
+	case KEY_A1:
+	    ch = 'y';
+	    break;
+	case KEY_A3:
+	    ch = 'u';
+	    break;
+	case KEY_C1:
+	    ch = 'b';
+	    break;
+	case KEY_C3:
+	    ch = 'n';
+	    break;
+	    /* next should be '.', but for problem with putty/linux */
+	case KEY_B2:
+	    ch = 'u';
+	    break;
 
 #ifdef KEY_SLEFT
-            case KEY_SRIGHT  : ch = CTRL('L'); break;
-            case KEY_SLEFT   : ch = CTRL('H'); break;
+	case KEY_SRIGHT:
+	    ch = CTRL('L');
+	    break;
+	case KEY_SLEFT:
+	    ch = CTRL('H');
+	    break;
 #ifdef KEY_SUP
-            case KEY_SUP     : ch = CTRL('K'); break;
-            case KEY_SDOWN   : ch = CTRL('J'); break;
+	case KEY_SUP:
+	    ch = CTRL('K');
+	    break;
+	case KEY_SDOWN:
+	    ch = CTRL('J');
+	    break;
 #endif
-            case KEY_SHOME   : ch = CTRL('Y'); break;
-            case KEY_SPREVIOUS:ch = CTRL('U'); break;
-            case KEY_SEND    : ch = CTRL('B'); break;
-            case KEY_SNEXT   : ch = CTRL('N'); break;
+	case KEY_SHOME:
+	    ch = CTRL('Y');
+	    break;
+	case KEY_SPREVIOUS:
+	    ch = CTRL('U');
+	    break;
+	case KEY_SEND:
+	    ch = CTRL('B');
+	    break;
+	case KEY_SNEXT:
+	    ch = CTRL('N');
+	    break;
 #endif
-            case 0x146       : ch = CTRL('K'); break;   /* Shift-Up     */
-            case 0x145       : ch = CTRL('J'); break;   /* Shift-Down   */
+	case 0x146:
+	    ch = CTRL('K');
+	    break;		/* Shift-Up     */
+	case 0x145:
+	    ch = CTRL('J');
+	    break;		/* Shift-Down   */
 
 
 #ifdef CTL_RIGHT
-            case CTL_RIGHT   : ch = CTRL('L'); break;
-            case CTL_LEFT    : ch = CTRL('H'); break;
-            case CTL_UP      : ch = CTRL('K'); break;
-            case CTL_DOWN    : ch = CTRL('J'); break;
-            case CTL_HOME    : ch = CTRL('Y'); break;
-            case CTL_PGUP    : ch = CTRL('U'); break;
-            case CTL_END     : ch = CTRL('B'); break;
-            case CTL_PGDN    : ch = CTRL('N'); break;
+	case CTL_RIGHT:
+	    ch = CTRL('L');
+	    break;
+	case CTL_LEFT:
+	    ch = CTRL('H');
+	    break;
+	case CTL_UP:
+	    ch = CTRL('K');
+	    break;
+	case CTL_DOWN:
+	    ch = CTRL('J');
+	    break;
+	case CTL_HOME:
+	    ch = CTRL('Y');
+	    break;
+	case CTL_PGUP:
+	    ch = CTRL('U');
+	    break;
+	case CTL_END:
+	    ch = CTRL('B');
+	    break;
+	case CTL_PGDN:
+	    ch = CTRL('N');
+	    break;
 #endif
 #ifdef KEY_EOL
-            case KEY_EOL     : ch = CTRL('B'); break;
+	case KEY_EOL:
+	    ch = CTRL('B');
+	    break;
 #endif
 
 #ifndef CTL_PAD1
-            /* MSYS rxvt console */
-            case 511         : ch = CTRL('J'); break; /* Shift Dn */
-            case 512         : ch = CTRL('J'); break; /* Ctl Down */
-            case 514         : ch = CTRL('H'); break; /* Ctl Left */
-            case 516         : ch = CTRL('L'); break; /* Ctl Right*/
-            case 518         : ch = CTRL('K'); break; /* Shift Up */
-            case 519         : ch = CTRL('K'); break; /* Ctl Up   */
+	    /* MSYS rxvt console */
+	case 511:
+	    ch = CTRL('J');
+	    break;		/* Shift Dn */
+	case 512:
+	    ch = CTRL('J');
+	    break;		/* Ctl Down */
+	case 514:
+	    ch = CTRL('H');
+	    break;		/* Ctl Left */
+	case 516:
+	    ch = CTRL('L');
+	    break;		/* Ctl Right */
+	case 518:
+	    ch = CTRL('K');
+	    break;		/* Shift Up */
+	case 519:
+	    ch = CTRL('K');
+	    break;		/* Ctl Up   */
 #endif
 
 #ifdef CTL_PAD1
-            case CTL_PAD1   : ch = CTRL('B'); break;
-            case CTL_PAD2   : ch = CTRL('J'); break;
-            case CTL_PAD3   : ch = CTRL('N'); break;
-            case CTL_PAD4   : ch = CTRL('H'); break;
-            case CTL_PAD5   : ch = '.'; break;
-            case CTL_PAD6   : ch = CTRL('L'); break;
-            case CTL_PAD7   : ch = CTRL('Y'); break;
-            case CTL_PAD8   : ch = CTRL('K'); break;
-            case CTL_PAD9   : ch = CTRL('U'); break;
+	case CTL_PAD1:
+	    ch = CTRL('B');
+	    break;
+	case CTL_PAD2:
+	    ch = CTRL('J');
+	    break;
+	case CTL_PAD3:
+	    ch = CTRL('N');
+	    break;
+	case CTL_PAD4:
+	    ch = CTRL('H');
+	    break;
+	case CTL_PAD5:
+	    ch = '.';
+	    break;
+	case CTL_PAD6:
+	    ch = CTRL('L');
+	    break;
+	case CTL_PAD7:
+	    ch = CTRL('Y');
+	    break;
+	case CTL_PAD8:
+	    ch = CTRL('K');
+	    break;
+	case CTL_PAD9:
+	    ch = CTRL('U');
+	    break;
 #endif
 
 #ifdef ALT_RIGHT
-            case ALT_RIGHT  : ch = CTRL('L'); break;
-            case ALT_LEFT   : ch = CTRL('H'); break;
-            case ALT_DOWN   : ch = CTRL('J'); break;
-            case ALT_HOME   : ch = CTRL('Y'); break;
-            case ALT_PGUP   : ch = CTRL('U'); break;
-            case ALT_END    : ch = CTRL('B'); break;
-            case ALT_PGDN   : ch = CTRL('N'); break;
+	case ALT_RIGHT:
+	    ch = CTRL('L');
+	    break;
+	case ALT_LEFT:
+	    ch = CTRL('H');
+	    break;
+	case ALT_DOWN:
+	    ch = CTRL('J');
+	    break;
+	case ALT_HOME:
+	    ch = CTRL('Y');
+	    break;
+	case ALT_PGUP:
+	    ch = CTRL('U');
+	    break;
+	case ALT_END:
+	    ch = CTRL('B');
+	    break;
+	case ALT_PGDN:
+	    ch = CTRL('N');
+	    break;
 #endif
 
 #ifdef ALT_PAD1
-            case ALT_PAD1   : ch = CTRL('B'); break;
-            case ALT_PAD2   : ch = CTRL('J'); break;
-            case ALT_PAD3   : ch = CTRL('N'); break;
-            case ALT_PAD4   : ch = CTRL('H'); break;
-            case ALT_PAD5   : ch = '.'; break;
-            case ALT_PAD6   : ch = CTRL('L'); break;
-            case ALT_PAD7   : ch = CTRL('Y'); break;
-            case ALT_PAD8   : ch = CTRL('K'); break;
-            case ALT_PAD9   : ch = CTRL('U'); break;
+	case ALT_PAD1:
+	    ch = CTRL('B');
+	    break;
+	case ALT_PAD2:
+	    ch = CTRL('J');
+	    break;
+	case ALT_PAD3:
+	    ch = CTRL('N');
+	    break;
+	case ALT_PAD4:
+	    ch = CTRL('H');
+	    break;
+	case ALT_PAD5:
+	    ch = '.';
+	    break;
+	case ALT_PAD6:
+	    ch = CTRL('L');
+	    break;
+	case ALT_PAD7:
+	    ch = CTRL('Y');
+	    break;
+	case ALT_PAD8:
+	    ch = CTRL('K');
+	    break;
+	case ALT_PAD9:
+	    ch = CTRL('U');
+	    break;
 #endif
-#ifdef KEY_BACKSPACE /* NCURSES in Keypad mode sends this for Ctrl-H */
-            case KEY_BACKSPACE: ch = CTRL('H'); break;
+#ifdef KEY_BACKSPACE		/* NCURSES in Keypad mode sends this for Ctrl-H */
+	case KEY_BACKSPACE:
+	    ch = CTRL('H');
+	    break;
 #endif
-        }
+	}
 
-        break;
+	break;
     }
 
-    nocbreak();     /* disable halfdelay mode if on */
+    nocbreak();			/* disable halfdelay mode if on */
     raw();
 
-    return(ch & 0x7F);
+    return (ch & 0x7F);
 }
 #endif
 
@@ -1431,38 +1595,35 @@ struct nlist avenrun = {
     "_avenrun"
 };
 
-void
-md_loadav(double *avg)
+void md_loadav(double *avg)
 {
     int kmem;
 
     if ((kmem = open("/dev/kmem", 0)) < 0)
-        goto bad;
+	goto bad;
     nlist(NAMELIST, &avenrun);
-    if (avenrun.n_type == 0)
-    {
-        close(kmem);
-bad:
-        avg[0] = 0.0;
-        avg[1] = 0.0;
-        avg[2] = 0.0;
-        return;
+    if (avenrun.n_type == 0) {
+	close(kmem);
+      bad:
+	avg[0] = 0.0;
+	avg[1] = 0.0;
+	avg[2] = 0.0;
+	return;
     }
 
     lseek(kmem, avenrun.n_value, 0);
-    read(kmem, (char *) avg, 3 * sizeof (double));
+    read(kmem, (char *) avg, 3 * sizeof(double));
     close(kmem);
 }
 #else
-void
-md_loadav(double *avg)
+void md_loadav(double *avg)
 {
 #if defined(HAVE_LOADAV)
-        loadav(avg);
+    loadav(avg);
 #elif defined(HAVE_GETLOADAVG)
-        getloadavg(avg,3);
+    getloadavg(avg, 3);
 #else
-        avg[0] = avg[1] = avg[2] = 0;
+    avg[0] = avg[1] = avg[2] = 0;
 #endif
 }
 #endif
@@ -1471,63 +1632,57 @@ md_loadav(double *avg)
 #define NSIG 32
 #endif
 
-void
-md_ignoreallsignals()
+void md_ignoreallsignals()
 {
-        int i;
+    int i;
 
-        for (i = 0; i < NSIG; i++)
-                signal(i, SIG_IGN);
+    for (i = 0; i < NSIG; i++)
+	signal(i, SIG_IGN);
 }
 
-void
-md_tstphold()
+void md_tstphold()
 {
 #ifdef SIGTSTP
     /*
      * If a process can be suspended, this code wouldn't work
      */
-# ifdef SIG_HOLD
+#ifdef SIG_HOLD
     signal(SIGTSTP, SIG_HOLD);
-# else
+#else
     signal(SIGTSTP, SIG_IGN);
-# endif
+#endif
 #endif
 }
 
-void
-md_tstpresume(void (*tstp)(int sig))
+void md_tstpresume(void (*tstp)(int sig))
 {
 #ifdef SIGTSTP
     signal(SIGTSTP, tstp);
 #else
-        if (tstp == NULL)
-                return;
+    if(tstp == NULL)
+	return;
 #endif
 }
 
-void
-md_tstpsignal()
+void md_tstpsignal()
 {
 #ifdef SIGTSTP
-    kill(0, SIGTSTP);           /* send actual signal and suspend process */
+    kill(0, SIGTSTP);		/* send actual signal and suspend process */
 #endif
 }
 
 #if defined(CHECKTIME)
-void
-md_start_checkout_timer(int time)
+void md_start_checkout_timer(int time)
 {
-    int  checkout();
+    int checkout();
 
 #if defined(HAVE_ALARM) && defined(SIGALRM)
     signal(SIGALRM, checkout);
-        alarm(time);
+    alarm(time);
 #endif
 }
 
-void
-md_stop_checkout_timer()
+void md_stop_checkout_timer()
 {
 #if defined(SIGALRM)
     signal(SIGALRM, SIG_IGN);
@@ -1538,68 +1693,60 @@ md_stop_checkout_timer()
 
 unsigned int md_endian = 0x01020304;
 
-unsigned int
-md_ntohl(unsigned int x)
+unsigned int md_ntohl(unsigned int x)
 {
-    if ( *((char *)&md_endian) == 0x01 )
-        return(x);
+    if (*((char *) &md_endian) == 0x01)
+	return (x);
     else
-        return( ((x & 0x000000ffU) << 24) |
-                ((x & 0x0000ff00U) <<  8) |
-                ((x & 0x00ff0000U) >>  8) |
-                ((x & 0xff000000U) >> 24) );
+	return (((x & 0x000000ffU) << 24) |
+		((x & 0x0000ff00U) << 8) |
+		((x & 0x00ff0000U) >> 8) | ((x & 0xff000000U) >> 24));
 }
 
-unsigned
-md_htonl(unsigned int x)
+unsigned md_htonl(unsigned int x)
 {
-    if ( *((char *)&md_endian) == 0x01 )
-        return(x);
+    if (*((char *) &md_endian) == 0x01)
+	return (x);
     else
-        return( ((x & 0x000000ffU) << 24) |
-                ((x & 0x0000ff00U) <<  8) |
-                ((x & 0x00ff0000U) >>  8) |
-                ((x & 0xff000000U) >> 24) );
+	return (((x & 0x000000ffU) << 24) |
+		((x & 0x0000ff00U) << 8) |
+		((x & 0x00ff0000U) >> 8) | ((x & 0xff000000U) >> 24));
 }
 
 static int endian = 1;
 static unsigned char *little_endian = (unsigned char *) &endian;
 
 /* Constants for key generation */
-# define OFFSET         667818
-# define MODULUS        894871
-# define MULT           2399
-# define ENCHAR         (((efp->efp_seed= ((efp->efp_seed*MULT+OFFSET)%MODULUS)) >> 10) & 0xff)
+#define OFFSET         667818
+#define MODULUS        894871
+#define MULT           2399
+#define ENCHAR         (((efp->efp_seed= ((efp->efp_seed*MULT+OFFSET)%MODULUS)) >> 10) & 0xff)
 
 /* Constants for checksumming */
-# define INITCK         1232531
-# define CKMOD          6506347
+#define INITCK         1232531
+#define CKMOD          6506347
 
-void
-efclearerr(EFILE *efp)
+void efclearerr(EFILE * efp)
 {
-        if (efp != NULL)
-                efp->efp_error = 0;
+    if (efp != NULL)
+	efp->efp_error = 0;
 }
 
-void
-efseterr(EFILE *efp, int err)
+void efseterr(EFILE * efp, int err)
 {
-        if (efp != NULL)
-                efp->efp_error = err;
+    if (efp != NULL)
+	efp->efp_error = err;
 }
 
-int
-eferror(EFILE *efp)
+int eferror(EFILE * efp)
 {
-        if (efp == NULL)
-                return(EBADF);
+    if (efp == NULL)
+	return (EBADF);
 
-        return(efp->efp_error);
+    return (efp->efp_error);
 }
 
-EFILE *
-efopen(const char *filename, const char *mode)
+EFILE *efopen(const char *filename, const char *mode)
 {
     EFILE *efp = NULL;
     FILE *fp = NULL;
@@ -1607,227 +1754,196 @@ efopen(const char *filename, const char *mode)
     int iomode = 0;
     unsigned int w[4];
 
-    if (mode[0] == 'r' && mode[1] == 0)
-    {
-        iomode = 0;
+    if (mode[0] == 'r' && mode[1] == 0) {
+	iomode = 0;
 
-        fp = fopen(filename, "rb");
+	fp = fopen(filename, "rb");
 
-        if (fread(w, 4, 4, fp) == 4)
-            seed = w[0] ^ w[1] ^ w[2] ^ w[3];
+	if (fread(w, 4, 4, fp) == 4)
+	    seed = w[0] ^ w[1] ^ w[2] ^ w[3];
+    } else if (mode[0] == 'w' && mode[1] == 0) {
+	iomode = 1;
+
+	fp = fopen(filename, "wb");
+
+	if (fp == NULL)
+	    return NULL;
+
+	seed = (int) (time(NULL) & 0x7fff);
+	srand(seed);
+	seed = md_htonl(seed);
+
+	w[0] = rand();
+	w[1] = rand();
+	w[2] = rand();
+	w[3] = w[0] ^ w[1] ^ w[2] ^ seed;
+
+	fwrite(w, 4, 4, fp);
+    } else
+	errno = EINVAL;
+
+    if (fp != NULL) {
+	efp = calloc(sizeof(struct EFILE), 1);
+
+	if (efp == NULL) {
+	    errno = ENOMEM;
+	    fclose(fp);
+	} else {
+	    efp->fp = fp;
+	    efp->efp_cksum = INITCK;
+	    efp->efp_seed = md_ntohl(seed);
+	    efp->efp_iomode = iomode;
+	}
     }
-    else if (mode[0] == 'w' && mode[1] == 0)
-    {
-        iomode = 1;
 
-        fp = fopen(filename, "wb");
-
-                if (fp == NULL)
-                        return NULL;
-
-                seed = (int) (time(NULL) & 0x7fff);
-                srand(seed);
-                seed = md_htonl(seed);
-
-                w[0] = rand();
-                w[1] = rand();
-                w[2] = rand();
-                w[3] = w[0] ^ w[1] ^ w[2] ^ seed;
-
-                fwrite(w, 4, 4, fp);
-    }
-        else
-                errno = EINVAL;
-
-        if (fp != NULL)
-        {
-                efp = calloc( sizeof(struct EFILE), 1 );
-
-                if (efp == NULL)
-                {
-                        errno = ENOMEM;
-                        fclose(fp);
-                }
-                else
-                {
-                        efp->fp = fp;
-                        efp->efp_cksum = INITCK;
-                        efp->efp_seed = md_ntohl(seed);
-                        efp->efp_iomode = iomode;
-                }
-        }
-
-    return(efp);
+    return (efp);
 }
 
-int
-efclose(EFILE *efp)
+int efclose(EFILE * efp)
 {
-        int ret = -1;
+    int ret = -1;
     unsigned int cksum;
-        unsigned int w[4];
+    unsigned int w[4];
 
     if (efp == NULL)
-                errno = EBADF;
-        else if (efp->fp == NULL)
-                errno = EBADF;
-        else if (efp->efp_error != 0)
-                errno = efp->efp_error;
-        else if (efp->efp_iomode == 0)  /* read mode */
-    {
-                if (fread(w, 4, 4, efp->fp) == 4)
-                {
-                        cksum = md_ntohl(w[0] ^ w[1] ^ w[2] ^ w[3]);
+	errno = EBADF;
+    else if (efp->fp == NULL)
+	errno = EBADF;
+    else if (efp->efp_error != 0)
+	errno = efp->efp_error;
+    else if (efp->efp_iomode == 0) {	/* read mode */
+	if (fread(w, 4, 4, efp->fp) == 4) {
+	    cksum = md_ntohl(w[0] ^ w[1] ^ w[2] ^ w[3]);
 
-                    if (cksum == efp->efp_cksum)
-                            ret = 0;
-                        else
-                                errno = EILSEQ;
-                }
+	    if (cksum == efp->efp_cksum)
+		ret = 0;
+	    else
+		errno = EILSEQ;
+	}
+    } else if (efp->efp_iomode == 1) {	/* write mode */
+	cksum = md_htonl(efp->efp_cksum);
+
+	w[0] = rand();
+	w[1] = rand();
+	w[2] = rand();
+	w[3] = w[0] ^ w[1] ^ w[2] ^ cksum;
+
+	if (fwrite(w, 4, 4, efp->fp) == 4)
+	    ret = 0;
+    } else
+	errno = EINVAL;
+
+    if (efp) {
+	if (efp->fp)
+	    fclose(efp->fp);
+
+	free(efp);
     }
-        else if (efp->efp_iomode == 1)  /* write mode */
-    {
-        cksum = md_htonl(efp->efp_cksum);
 
-                w[0] = rand();
-                w[1] = rand();
-                w[2] = rand();
-                w[3] = w[0] ^ w[1] ^ w[2] ^ cksum;
-
-        if (fwrite(w, 4, 4, efp->fp) == 4)
-                ret = 0;
-    }
-        else
-            errno = EINVAL;
-
-    if (efp)
-        {
-            if (efp->fp)
-                        fclose(efp->fp);
-
-                free(efp);
-        }
-
-    return(ret);
+    return (ret);
 }
 
-size_t
-efread(void *ptr, size_t size, size_t nitems, EFILE *efp)
+size_t efread(void *ptr, size_t size, size_t nitems, EFILE * efp)
 {
-        unsigned char *start = ptr;
-        size_t cnt, items = 0;
-        int ch;
+    unsigned char *start = ptr;
+    size_t cnt, items = 0;
+    int ch;
 
     if ((efp == NULL) || (efp->efp_iomode != 0))
-        errno = EBADF;
+	errno = EBADF;
     else if (ptr == NULL)
-        errno = EINVAL;
-        else if (efp->efp_error != 0)
-                errno = efp->efp_error;
-        else
-        {
-                items = fread(ptr,size,nitems,efp->fp);
+	errno = EINVAL;
+    else if (efp->efp_error != 0)
+	errno = efp->efp_error;
+    else {
+	items = fread(ptr, size, nitems, efp->fp);
 
-                for (cnt = size * items; cnt--; )
-                {
-                        ch = (*start++ ^= ENCHAR) & 0xff;
-                        efp->efp_cksum = ((efp->efp_cksum << 8) + ch) % CKMOD;
-                }
+	for (cnt = size * items; cnt--;) {
+	    ch = (*start++ ^= ENCHAR) & 0xff;
+	    efp->efp_cksum = ((efp->efp_cksum << 8) + ch) % CKMOD;
+	}
 
-                if (items != nitems)
-                        efp->efp_error = errno;
-        }
+	if (items != nitems)
+	    efp->efp_error = errno;
+    }
 
-        return(items);
+    return (items);
 }
 
-size_t
-efwrite(const void *ptr, size_t size, size_t nitems, EFILE *efp)
+size_t efwrite(const void *ptr, size_t size, size_t nitems, EFILE * efp)
 {
-        const unsigned char *start = ptr;
-        size_t length, cnt;
-        int ch;
-        size_t items = 0;
+    const unsigned char *start = ptr;
+    size_t length, cnt;
+    int ch;
+    size_t items = 0;
 
     if ((efp == NULL) || (efp->efp_iomode != 1))
-        errno = EBADF;
-        else if (ptr == NULL)
-                errno = EINVAL;
-        else if (efp->efp_error != 0)
-                errno = efp->efp_error;
-        else
-        {
-                length = size * nitems;
+	errno = EBADF;
+    else if (ptr == NULL)
+	errno = EINVAL;
+    else if (efp->efp_error != 0)
+	errno = efp->efp_error;
+    else {
+	length = size * nitems;
 
-                for(cnt = length; cnt--;)
-                {
-                        ch = *start++ & 0xff;
-                        efp->efp_cksum = ((efp->efp_cksum << 8) + ch) % CKMOD;
+	for (cnt = length; cnt--;) {
+	    ch = *start++ & 0xff;
+	    efp->efp_cksum = ((efp->efp_cksum << 8) + ch) % CKMOD;
 
-                        if (fputc(ch ^ ENCHAR, efp->fp) == -1)
-                        {
-                                efp->efp_error = errno;
-                                items = (length-size)/size;
-                                break;
-                        }
-                }
+	    if (fputc(ch ^ ENCHAR, efp->fp) == -1) {
+		efp->efp_error = errno;
+		items = (length - size) / size;
+		break;
+	    }
+	}
 
-                fflush(efp->fp);
-        }
+	fflush(efp->fp);
+    }
 
-        return items;
+    return items;
 }
 
-size_t
-efwriten(const void *ptr, size_t size, EFILE *efp)
+size_t efwriten(const void *ptr, size_t size, EFILE * efp)
 {
     unsigned char bytes[4];
     unsigned char *buf = (unsigned char *) ptr;
 
-        if (size == 4)
-        {
-            if (*little_endian)
-                {
-                bytes[3] = buf[0];
-                    bytes[2] = buf[1];
-                        bytes[1] = buf[2];
-                        bytes[0] = buf[3];
-                        buf = bytes;
-                }
+    if (size == 4) {
+	if (*little_endian) {
+	    bytes[3] = buf[0];
+	    bytes[2] = buf[1];
+	    bytes[1] = buf[2];
+	    bytes[0] = buf[3];
+	    buf = bytes;
+	}
 
-                return efwrite(buf,1,4,efp);
-        }
-        else
-                return efwrite(buf,1,size,efp);
+	return efwrite(buf, 1, 4, efp);
+    } else
+	return efwrite(buf, 1, size, efp);
 }
 
-size_t
-efreadn(void *ptr, size_t size, EFILE *efp)
+size_t efreadn(void *ptr, size_t size, EFILE * efp)
 {
     unsigned char bytes[4];
     unsigned char *buf = ptr;
 
-        if (size == 4)
-        {
-                unsigned int *i = ptr;
+    if (size == 4) {
+	unsigned int *i = ptr;
 
-                if (efread(buf, 4, 1, efp) == 1)
-                {
-                        if (*little_endian)
-                        {
-                                bytes[3] = buf[0];
-                                bytes[2] = buf[1];
-                                bytes[1] = buf[2];
-                                bytes[0] = buf[3];
-                                buf = bytes;
-                        }
+	if (efread(buf, 4, 1, efp) == 1) {
+	    if (*little_endian) {
+		bytes[3] = buf[0];
+		bytes[2] = buf[1];
+		bytes[1] = buf[2];
+		bytes[0] = buf[3];
+		buf = bytes;
+	    }
 
-                        *i = *((unsigned int *) buf);
-                        return 1;
-                }
-        }
-        else
-                return efread(ptr,size,1,efp);
+	    *i = *((unsigned int *) buf);
+	    return 1;
+	}
+    } else
+	return efread(ptr, size, 1, efp);
 
-        return 0;
+    return 0;
 }

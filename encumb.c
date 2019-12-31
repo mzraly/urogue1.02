@@ -19,25 +19,24 @@
  * updpack:
  *      Update his pack weight and adjust fooduse accordingly
  */
-void
-updpack(int getmax)
+void updpack(int getmax)
 {
 
-        int topcarry, curcarry;
+    int topcarry, curcarry;
 
-        if (getmax)
-            pstats.s_carry = totalenc();        /* get total encumb */
-        curcarry = packweight();                /* get pack weight */
-        topcarry = pstats.s_carry / 5;          /* 20% of total carry */
-        if(curcarry > 4 * topcarry) {
-            if(rnd(100) < 80)
-                foodlev = 3;                    /* > 80% of pack */
-        } else if(curcarry > 3 * topcarry) {
-            if(rnd(100) < 60)
-                foodlev = 2;                    /* > 60% of pack */
-        } else
-            foodlev = 1;                        /* <= 60% of pack */
-        pstats.s_pack = curcarry;               /* update pack weight */
+    if (getmax)
+	pstats.s_carry = totalenc();	/* get total encumb */
+    curcarry = packweight();	/* get pack weight */
+    topcarry = pstats.s_carry / 5;	/* 20% of total carry */
+    if (curcarry > 4 * topcarry) {
+	if (rnd(100) < 80)
+	    foodlev = 3;	/* > 80% of pack */
+    } else if (curcarry > 3 * topcarry) {
+	if (rnd(100) < 60)
+	    foodlev = 2;	/* > 60% of pack */
+    } else
+	foodlev = 1;		/* <= 60% of pack */
+    pstats.s_pack = curcarry;	/* update pack weight */
 }
 
 
@@ -45,24 +44,23 @@ updpack(int getmax)
  * packweight:
  *      Get the total weight of the hero's pack
  */
-int
-packweight(void)
+int packweight(void)
 {
-        struct object *obj;
-        struct linked_list *pc;
-        int weight;
+    struct object *obj;
+    struct linked_list *pc;
+    int weight;
 
-        weight = 0;
-        for(pc = pack ; pc != NULL ; pc = next(pc)) {
-            obj = OBJPTR(pc);
-            weight += itemweight(obj) * obj->o_count;
-        }
-        if(ISWEARING(R_CARRYING))
-            weight -= (ring_value(R_CARRYING) * weight) / 4;
-        if(weight < 0)          /* in case of artifacts and stuff */
-             weight = 0;
+    weight = 0;
+    for (pc = pack; pc != NULL; pc = next(pc)) {
+	obj = OBJPTR(pc);
+	weight += itemweight(obj) * obj->o_count;
+    }
+    if (ISWEARING(R_CARRYING))
+	weight -= (ring_value(R_CARRYING) * weight) / 4;
+    if (weight < 0)		/* in case of artifacts and stuff */
+	weight = 0;
 
-        return(weight);
+    return (weight);
 }
 
 
@@ -70,31 +68,32 @@ packweight(void)
  * itemweight:
  *      Get the weight of an object
  */
-int
-itemweight(struct object *wh)
+int itemweight(struct object *wh)
 {
-        int weight;
-        int ac;
+    int weight;
+    int ac;
 
-        weight = wh->o_weight;          /* get base weight */
-        switch(wh->o_type) {
-            case ARMOR:
-                /*
-                 * subtract 20% for each enchantment
-                 * this will add weight for negative items
-                 */
-                ac = armors[wh->o_which].a_class - wh->o_ac;
-                weight = ((weight*5) - (weight*ac)) / 5;
-                if (weight < 0) weight = 0;
-            break; case WEAPON:
-                if ((wh->o_hplus + wh->o_dplus) > 0)
-                        weight /= 2;
-        }
-        if(wh->o_flags & ISCURSED)
-                weight += weight / 5;   /* 20% more for cursed */
-        else if(wh->o_flags & ISBLESSED)
-                weight -= weight / 5;   /* 20% less for blessed */
-        return(weight);
+    weight = wh->o_weight;	/* get base weight */
+    switch (wh->o_type) {
+    case ARMOR:
+	/*
+	 * subtract 20% for each enchantment
+	 * this will add weight for negative items
+	 */
+	ac = armors[wh->o_which].a_class - wh->o_ac;
+	weight = ((weight * 5) - (weight * ac)) / 5;
+	if (weight < 0)
+	    weight = 0;
+	break;
+    case WEAPON:
+	if ((wh->o_hplus + wh->o_dplus) > 0)
+	    weight /= 2;
+    }
+    if (wh->o_flags & ISCURSED)
+	weight += weight / 5;	/* 20% more for cursed */
+    else if (wh->o_flags & ISBLESSED)
+	weight -= weight / 5;	/* 20% less for blessed */
+    return (weight);
 }
 
 
@@ -102,10 +101,9 @@ itemweight(struct object *wh)
  * playenc:
  *      Get hero's carrying ability above norm
  */
-int
-playenc(void)
+int playenc(void)
 {
-        return ((pstats.s_str-8)*50);
+    return ((pstats.s_str - 8) * 50);
 }
 
 
@@ -113,19 +111,22 @@ playenc(void)
  * totalenc:
  *      Get total weight that the hero can carry
  */
-int
-totalenc(void)
+int totalenc(void)
 {
-        int wtotal;
+    int wtotal;
 
-        wtotal = NORMENCB + playenc();
-        switch(hungry_state) {
-                case F_OK:
-                case F_HUNGRY:  ;                       /* no change */
-                break; case F_WEAK:     wtotal -= wtotal / 10;  /* 10% off weak */
-                break; case F_FAINT:    wtotal /= 2;            /* 50% off faint */
-        }
-        return(wtotal);
+    wtotal = NORMENCB + playenc();
+    switch (hungry_state) {
+    case F_OK:
+    case F_HUNGRY:;		/* no change */
+	break;
+    case F_WEAK:
+	wtotal -= wtotal / 10;	/* 10% off weak */
+	break;
+    case F_FAINT:
+	wtotal /= 2;		/* 50% off faint */
+    }
+    return (wtotal);
 }
 
 
@@ -134,34 +135,33 @@ totalenc(void)
  * whgtchk:
  *      See if the hero can carry his pack
  */
-void
-wghtchk(void)
+void wghtchk(void)
 {
-        int dropchk, err = TRUE;
-        int ch;
+    int dropchk, err = TRUE;
+    int ch;
 
-        inwhgt = TRUE;
-        if (pstats.s_pack > pstats.s_carry) {
-            ch = CCHAR( mvwinch(stdscr, hero.y, hero.x) );
-            if((ch != FLOOR && ch != PASSAGE)) {
-                extinguish(wghtchk);
-                fuse(wghtchk,(void *)TRUE,1,AFTER);
-                inwhgt = FALSE;
-                return;
-            }
-            extinguish(wghtchk);
-            msg("Your pack is too heavy for you.");
-            do {
-                dropchk = drop(NULL);
-                if(dropchk == 0) {
-                    mpos = 0;
-                    msg("You must drop something.");
-                }
-                if(dropchk == TRUE)
-                    err = FALSE;
-            } while(err);
-        }
-        inwhgt = FALSE;
+    inwhgt = TRUE;
+    if (pstats.s_pack > pstats.s_carry) {
+	ch = CCHAR(mvwinch(stdscr, hero.y, hero.x));
+	if ((ch != FLOOR && ch != PASSAGE)) {
+	    extinguish(wghtchk);
+	    fuse(wghtchk, (void *) TRUE, 1, AFTER);
+	    inwhgt = FALSE;
+	    return;
+	}
+	extinguish(wghtchk);
+	msg("Your pack is too heavy for you.");
+	do {
+	    dropchk = drop(NULL);
+	    if (dropchk == 0) {
+		mpos = 0;
+		msg("You must drop something.");
+	    }
+	    if (dropchk == TRUE)
+		err = FALSE;
+	} while (err);
+    }
+    inwhgt = FALSE;
 }
 
 
@@ -172,8 +172,7 @@ wghtchk(void)
  *                       0 hit for medium pack weight
  *                      -1 hit for heavy pack weight
  */
-int
-hitweight(void)
+int hitweight(void)
 {
-        return(2 - foodlev);
+    return (2 - foodlev);
 }

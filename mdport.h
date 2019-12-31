@@ -49,7 +49,7 @@
 #define HAVE_ALARM 1
 #define HAVE_SPAWNL 1
 #define HAVE__SPAWNL 1
-#else /* POSIX */
+#else				/* POSIX */
 #define HAVE_TIME_H 1
 #define HAVE_VSNPRINTF 1
 #define HAVE_SYS_TYPES_H 1
@@ -93,31 +93,31 @@
 #endif
 
 #ifdef __DJGPP__
-#undef HAVE_GETPWUID /* DJGPP's limited version doesn't even work as documented */
+#undef HAVE_GETPWUID		/* DJGPP's limited version doesn't even work as documented */
 #endif
 
-int  md_chmod(char *filename, int mode);
+int md_chmod(char *filename, int mode);
 char *md_crypt(char *key, char *salt);
-int  md_dsuspchar();
-int  md_erasechar();
+int md_dsuspchar();
+int md_erasechar();
 char *md_gethomedir();
 char *md_getusername();
-int  md_getuid();
+int md_getuid();
 char *md_getpass(char *prompt);
-int  md_getpid();
+int md_getpid();
 char *md_getrealname(int uid);
 void md_init();
-int  md_killchar();
+int md_killchar();
 void md_normaluser();
 void md_raw_standout();
 void md_raw_standend();
-int  md_readchar();
-int  md_setdsuspchar(int c);
+int md_readchar();
+int md_setdsuspchar(int c);
 void md_sleep(int s);
-int  md_suspchar();
-int  md_hasclreol();
-int  md_unlink(char *file);
-int  md_unlink_open_file(char *file, FILE *inf);
+int md_suspchar();
+int md_hasclreol();
+int md_unlink(char *file);
+int md_unlink_open_file(char *file, FILE * inf);
 void md_tstpsignal();
 void md_tstphold();
 void md_tstpresume(void (*tstp)(int sig));
@@ -127,7 +127,7 @@ void md_stop_checkout_timer(void);
 void md_onsignal_autosave();
 void md_onsignal_exit();
 void md_onsignal_default();
-int  md_issymlink(char *sp);
+int md_issymlink(char *sp);
 unsigned int md_htonl(unsigned int);
 unsigned int md_ntohl(unsigned int);
 int md_shellescape(void);
@@ -150,21 +150,20 @@ extern int md_exec(const char *path, const char *arg0, const char *arg1);
 #define pclose _pclose
 #endif
 
-typedef struct EFILE
-{
-        FILE *fp;
-        unsigned int efp_cksum;
-        unsigned int efp_seed;
-        int efp_iomode;
-        int efp_error;
+typedef struct EFILE {
+    FILE *fp;
+    unsigned int efp_cksum;
+    unsigned int efp_seed;
+    int efp_iomode;
+    int efp_error;
 } EFILE;
 
-void efclearerr(EFILE *efp);
-void efseterr(EFILE *efp, int err);
-int eferror(EFILE *efp);
+void efclearerr(EFILE * efp);
+void efseterr(EFILE * efp, int err);
+int eferror(EFILE * efp);
 EFILE *efopen(const char *filename, const char *mode);
-int efclose(EFILE *efp);
-size_t efread(void *ptr, size_t size, size_t nitems, EFILE *efp);
-size_t efwrite(const void *ptr, size_t size, size_t nitems, EFILE *efp);
-size_t efwriten(const void *ptr, size_t size, EFILE *efp);
-size_t efreadn(void *ptr, size_t size, EFILE *efp);
+int efclose(EFILE * efp);
+size_t efread(void *ptr, size_t size, size_t nitems, EFILE * efp);
+size_t efwrite(const void *ptr, size_t size, size_t nitems, EFILE * efp);
+size_t efwriten(const void *ptr, size_t size, EFILE * efp);
+size_t efreadn(void *ptr, size_t size, EFILE * efp);
