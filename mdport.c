@@ -266,9 +266,12 @@ int md_hasclreol()
 #ifdef NCURSES_VERSION
     if (cur_term == NULL)
 	return (0);
-    /*
+    /* gcc complains about the following line with this message:
+       ... error: dereferencing pointer to incomplete type ‘TERMINAL’ {aka ‘struct term’}
+       so we comment it out.  More than likely we *do* have clr_eol support anyway.
+
        if (cur_term->type.Strings == NULL)
-       return(0);
+           return(0);
      */
 #endif
     return ((clr_eol != NULL) && (*clr_eol != 0));
